@@ -1,5 +1,5 @@
 """
-WSGI config for blogProject project.
+WSGI config for bet project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
