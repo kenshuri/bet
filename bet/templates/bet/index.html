@@ -1,14 +1,38 @@
 {% extends "bet/base.html" %}
 
 {% block title %}
-    Landing Page
+    MGP
 {% endblock title %}
 
 {% block main %}
-    <div>
-    My landing page 🚀
+    {% if user_leagues %}
+    <div class="flex flex-1 justify-center mt-2">
+
+    <div class="overflow-x-auto">
+        <table class="table">
+            <!-- head -->
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Paris</th>
+                <th><span class="hidden md:inline">Paris </span>Justes</th>
+                <th><span class="hidden md:inline">Paris </span>Parfaits</th>
+                <th>Points</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for u in table_dict %}
+                <tr class="">
+                <td>{{ u.first_name }}</td>
+                <td>{{ u.bet_id }}</td>
+                <td>{{ u.bet_correct }}</td>
+                <td>{{ u.bet_perfect }}</td>
+                <td>{{ u.total_points }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div>
-    <button class="btn">daisy button</button>
     </div>
+    {% endif %}
 {% endblock main %}

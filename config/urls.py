@@ -21,5 +21,12 @@ import bet.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', bet.views.index, name='index'),
+    path('bets', bet.views.bets, name='bets'),
+    path('place_bet', bet.views.place_bet, name='place_bet'),
+    path('leagues', bet.views.leagues, name='leagues'),
+    path('join_league/<int:league_id>', bet.views.join_league, name='join_league'),
+    path('quit_league/<int:league_id>', bet.views.quit_league, name='quit_league'),
     path('__reload__/', include('django_browser_reload.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('signup/', bet.views.signup, name='signup'),
 ]

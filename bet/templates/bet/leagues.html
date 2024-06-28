@@ -1,0 +1,29 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP - Leagues
+{% endblock title %}
+
+{% block main %}
+    <div class="flex flex-1 flex-col gap-2">
+        {% for league in leagues %}
+            <div class="flex flex-1 justify-center">
+                <div class="card bg-base-100 shadow-xl max-w-xl flex-1 mx-2">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ league.name }}</h2>
+                        {% if request.user in league.users.all %}
+                            <p>You're in this league.</p>
+                            <div class="card-actions justify-end">
+                                <a href="{% url 'quit_league' league.id %}" class="btn btn-error">quit league</a>
+                            </div>
+                        {% else %}
+                            <div class="card-actions justify-end">
+                                <a href="{% url 'join_league' league.id %}" class="btn btn-success">join league</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock main %}

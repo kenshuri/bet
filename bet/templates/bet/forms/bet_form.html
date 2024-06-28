@@ -1,0 +1,36 @@
+<div class="mx-2">
+    <form class="flex flex-1 justify-center" action="{% url 'place_bet' %}" method="post">
+        {% csrf_token %}
+        <div class="card bg-base-100 shadow-xl flex flex-1 max-w-xl">
+            <div class="card-body">
+                <h2 class="card-title flex justify-between">
+                    <div>Match {{ bet_form.instance.game.id }}</div>
+                    <div class="text-sm italic">{{ bet_form.instance.game.start_datetime }}</div>
+                </h2>
+                <div class="flex flex-1 gap-2 items-center justify-between">
+                    <div>{{ bet_form.instance.game.team_1.name }}</div>
+                    <div class="form-control">
+                        <label class="label hidden" for="id_score_team1"></label>
+                        <input required min="0" type="number" placeholder="X" class="input input-bordered w-16"
+                               name="score_team1" id="id_score_team1" value="{{ bet_form.instance.score_team1 }}"/>
+                    </div>
+                    <div>-</div>
+                    <div class="form-control">
+                        <label class="label hidden" for="id_score_team2"></label>
+                        <input required min="0" type="number" placeholder="X" class="input input-bordered w-16"
+                               name="score_team2" id="id_score_team2" value="{{ bet_form.instance.score_team2 }}"/>
+                    </div>
+                    <div>{{ bet_form.instance.game.team_2.name }}</div>
+                </div>
+                <div>
+                    {{ bet_form.game.as_hidden }}
+                    {{ bet_form.league.as_hidden }}
+                </div>
+
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" type="submit">Bet</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

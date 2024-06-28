@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bet.apps.BetConfig',
     'accounts',
     'django_browser_reload',
+    'fontawesomefree'
 ]
 
 # Custom User model
@@ -114,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 

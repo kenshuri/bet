@@ -1,0 +1,57 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    Petites Annonces Théâtre
+{% endblock title %}
+
+{% block main %}
+    <div class="bg-base-100 rounded p-4 mt-2">
+        {% if form.errors %}
+            <div class="bg-error flex p-2 rounded items-center gap-3">
+                <div>
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    {{ form.errors.username }}
+                    {{ form.errors.first_name }}
+                    {{ form.errors.email }}
+                    {{ form.errors.password1 }}
+                    {{ form.errors.password2 }}
+                </div>
+            </div>
+        {% endif %}
+        <form action="{% url 'signup' %}" class="form-control" method="post">
+            {% csrf_token %}
+            <div class="form-control">
+                <label for="id_email" class="label">Email</label>
+                <input type="email" name="email" maxlength="254" autofocus id="id_email"
+                       class="input input-bordered">
+            </div>
+            <div class="form-control">
+                <label for="id_first_name" class="label">Prénom</label>
+                <input type="text" name="first_name" required maxlength="254" autofocus id="id_first_name"
+                       class="input input-bordered">
+            </div>
+            <div class="form-control">
+                <label for="id_password1" class="label">Mot de passe</label>
+                <input type="password" name="password1" autocomplete="new-password" required aria-describedby="id_password1_helptext" id="id_password1"
+                       class="input input-bordered">
+                <label class="label" for="id_password1">
+                    <span class="label-text-alt text-sm" id="id_password1_helptext">Le mot doit faire plus de 8 caractères, ne pas être un mot de passe trop commun et ne pas être entièrement numérique.</span>
+                </label>
+            </div>
+            <div class="form-control">
+                <label for="id_password2" class="label">Confirmation du mot de passe</label>
+                <input type="password" name="password2" autocomplete="new-password" required aria-describedby="id_password2_helptext" id="id_password2"
+                       class="input input-bordered">
+            </div>
+
+            <button class="btn mt-2"
+                    type="submit">S'inscrire</button>
+            <input type="hidden" name="next" value="{% url 'index'%}">
+        </form>
+        <a href="{% url 'login' %}" class="btn btn-block btn-accent btn-outline mt-2">
+                se connecter
+        </a>
+    </div>
+{% endblock %}

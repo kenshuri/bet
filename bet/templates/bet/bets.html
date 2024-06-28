@@ -1,0 +1,13 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP - Fais tes paris
+{% endblock title %}
+
+{% block main %}
+    <div class="flex flex-col mt-2 gap-2">
+    {% for bet_form in upcoming_bets %}
+        {% include 'bet/forms/bet_form.html' with bet_form=bet_form %}
+    {% endfor %}
+    </div>
+{% endblock main %}
