@@ -4,11 +4,11 @@
         <div class="card bg-base-100 shadow-xl flex flex-1 max-w-xl">
             <div class="card-body">
                 <h2 class="card-title flex justify-between">
-                    <div>Match {{ bet_form.instance.game.id }}</div>
+                    <div>Match {{ bet_form.instance.game.euro_number }}</div>
                     <div class="text-sm italic">{{ bet_form.instance.game.start_datetime }}</div>
                 </h2>
                 <div class="flex flex-1 gap-2 items-center justify-between">
-                    <div>{{ bet_form.instance.game.team_1.name }}</div>
+                    <div class="text-lg">{{ bet_form.instance.game.team_1.name }}</div>
                     <div class="form-control">
                         <label class="label hidden" for="id_score_team1"></label>
                         <input required min="0" type="number" placeholder="X" class="input input-bordered w-16"
@@ -20,7 +20,7 @@
                         <input required min="0" type="number" placeholder="X" class="input input-bordered w-16"
                                name="score_team2" id="id_score_team2" value="{{ bet_form.instance.score_team2 }}"/>
                     </div>
-                    <div>{{ bet_form.instance.game.team_2.name }}</div>
+                    <div class="text-lg">{{ bet_form.instance.game.team_2.name }}</div>
                 </div>
                 <div>
                     {{ bet_form.game.as_hidden }}
