@@ -52,15 +52,9 @@ def bets(request):
 
 @login_required
 def place_bet(request):
-    print('inside place_bet function')
-    print(request.POST)
-    print(request.method)
     if request.method == 'POST':
-        print('inside place_bet function after POST check')
         form = BetForm(request.POST)
-        print(form.is_valid())
         if form.is_valid():
-            print('form is valid')
             bet, created = Bet.objects.update_or_create(
                 user=request.user,
                 game=form.cleaned_data['game'],
@@ -72,7 +66,6 @@ def place_bet(request):
             )
             return redirect('bets')
         else:
-            print('form is invalid')
             for field_name, errors in form.errors.items():
                 for error in errors:
                     print(f'Error in {field_name}: {error}')
