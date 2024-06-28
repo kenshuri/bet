@@ -26,7 +26,8 @@ def index(request):
 @login_required
 def bets(request):
     user_leagues = League.objects.filter(users=request.user)
-    league_id = 1
+    league = League.objects.all()[:1].get()
+    league_id = league.id
     upcoming_games = list(Game.objects.filter(start_datetime__gt=timezone.now()).order_by('start_datetime').values_list('pk', flat=True))
     existing_bets = Bet.objects.filter(league_id=league_id).filter(user=request.user).filter(game__in=upcoming_games)
     upcoming_bets = list()
@@ -37,7 +38,6 @@ def bets(request):
         else:
             # Create a new Bet form using the information in Game
             game = get_object_or_404(Game, pk=game_id)
-            league = League.objects.all()[:1].get()
             bet_form = BetForm(instance=Bet(
                 game = game,
                 league = league,
@@ -70,7 +70,7 @@ def place_bet(request):
                     'score_team2': form.cleaned_data['score_team2']
                 }
             )
-            return redirect("bets", league_id=1)
+            return redirect('bets')
         else:
             print('form is invalid')
             for field_name, errors in form.errors.items():

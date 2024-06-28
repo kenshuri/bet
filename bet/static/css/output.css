@@ -3435,16 +3435,8 @@ html {
   width: 13rem;
 }
 
-.w-6 {
-  width: 1.5rem;
-}
-
 .max-w-3xl {
   max-width: 48rem;
-}
-
-.max-w-sm {
-  max-width: 24rem;
 }
 
 .max-w-xl {
