@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+
+from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm
 from bet.models import Game, Bet, CustomUser, League
 from django.utils import timezone
@@ -35,7 +37,7 @@ def bets(request):
         else:
             # Create a new Bet form using the information in Game
             game = get_object_or_404(Game, pk=game_id)
-            league = get_object_or_404(League, pk=league_id)
+            league = League.objects.all()[:1].get()
             bet_form = BetForm(instance=Bet(
                 game = game,
                 league = league,
@@ -97,7 +99,7 @@ def quit_league(request, league_id):
 
 def signup(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             email = form.cleaned_data.get('email')

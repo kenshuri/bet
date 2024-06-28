@@ -3435,8 +3435,16 @@ html {
   width: 13rem;
 }
 
+.w-6 {
+  width: 1.5rem;
+}
+
 .max-w-3xl {
   max-width: 48rem;
+}
+
+.max-w-sm {
+  max-width: 24rem;
 }
 
 .max-w-xl {
@@ -3445,6 +3453,10 @@ html {
 
 .flex-1 {
   flex: 1 1 0%;
+}
+
+.table-fixed {
+  table-layout: fixed;
 }
 
 .grid-flow-col {
@@ -3536,14 +3548,14 @@ html {
   line-height: 1.5rem;
 }
 
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 .font-bold {
