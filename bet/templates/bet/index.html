@@ -13,21 +13,21 @@
                     <!-- head -->
                     <thead>
                     <tr>
-                        <th class="">Nom</th>
-                        <th>Paris</th>
-                        <th><span class="hidden md:inline">Paris </span>Justes</th>
-                        <th><span class="hidden md:inline">Paris </span>Parfaits</th>
-                        <th>Points</th>
+                        <th class="whitespace-normal max-w-16 sm:max-w-none" >Nom</th>
+                        <th class="whitespace-normal max-w-16 sm:max-w-none">Paris</th>
+                        <th class="whitespace-normal max-w-16 sm:max-w-none"><span class="hidden md:inline">Paris </span>Justes</th>
+                        <th class="whitespace-normal max-w-16 sm:max-w-none"><span class="hidden md:inline">Paris </span>Parfaits</th>
+                        <th class="whitespace-normal max-w-16 sm:max-w-none">Points</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for u in table_dict %}
                         <tr class="">
-                            <td>{{ u.first_name }}</td>
-                            <td>{{ u.bet_id }}</td>
-                            <td>{{ u.bet_correct }}</td>
-                            <td>{{ u.bet_perfect }}</td>
-                            <td>{{ u.total_points }}</td>
+                            <td class="whitespace-normal max-w-16 sm:max-w-none">{{ u.first_name }}</td>
+                            <td class="whitespace-normal max-w-16 sm:max-w-none">{{ u.bet_id }}</td>
+                            <td class="whitespace-normal max-w-16 sm:max-w-none ">{{ u.bet_correct }}</td>
+                            <td class="whitespace-normal max-w-16 sm:max-w-none ">{{ u.bet_perfect }}</td>
+                            <td class="whitespace-normal max-w-16 sm:max-w-none ">{{ u.total_points | floatformat:1 }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

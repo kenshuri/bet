@@ -55,16 +55,21 @@ def place_bet(request):
     if request.method == 'POST':
         form = BetForm(request.POST)
         if form.is_valid():
-            bet, created = Bet.objects.update_or_create(
-                user=request.user,
-                game=form.cleaned_data['game'],
-                league=form.cleaned_data['league'],
-                defaults={
-                    'score_team1': form.cleaned_data['score_team1'],
-                    'score_team2': form.cleaned_data['score_team2']
-                }
-            )
-            return redirect('bets')
+            game = form.cleaned_data['game']
+            if game.start_datetime < timezone.now():
+                print('Game already started')
+                return redirect('bets')
+            else:
+                bet, created = Bet.objects.update_or_create(
+                    user=request.user,
+                    game=form.cleaned_data['game'],
+                    league=form.cleaned_data['league'],
+                    defaults={
+                        'score_team1': form.cleaned_data['score_team1'],
+                        'score_team2': form.cleaned_data['score_team2']
+                    }
+                )
+                return redirect('bets')
         else:
             for field_name, errors in form.errors.items():
                 for error in errors:

@@ -19,7 +19,7 @@ class Game(models.Model):
     start_datetime = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.euro_number}: {self.team_1} vs {self.team_2}"
+        return f"{self.id}-{self.euro_number}: {self.team_1} vs {self.team_2}"
 
 
 class League(models.Model):

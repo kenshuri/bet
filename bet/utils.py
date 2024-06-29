@@ -17,7 +17,8 @@ def get_table(league: int = 1):
         'id': 'user_id'
     })
     if games_qs.exists():
-        bets_qs = Bet.objects.filter(league=league).filter(game__in=list(games.select('game_id').to_series())).values('id', 'game_id','league', 'user', 'score_team1', 'score_team2')
+        # bets_qs = Bet.objects.filter(league=league).filter(game__in=games_qs.values('id')).values('id', 'game_id','league', 'user', 'score_team1', 'score_team2')
+        bets_qs = Bet.objects.filter(game__in=games_qs.values('id')).values('id', 'game_id', 'league', 'user','score_team1', 'score_team2')
         games = pl.from_records(list(games_qs)).rename(
             {'id': 'game_id',
              'score_team1': 'final_score_team1',
@@ -70,14 +71,19 @@ def get_table(league: int = 1):
 
             details = details.vstack(aux)
 
-        final = details.group_by('user_id').agg(
+        final_aux = details.group_by('user_id').agg(
             pl.col('bet_id').count(),
             pl.col('bet_correct').sum(),
             pl.col('bet_perfect').sum(),
             pl.col('correct_points').sum(),
             pl.col('perfect_points').sum(),
             pl.col('total_points').sum(),
-        ).sort(by='total_points', descending=True).join(users, how='left', on='user_id')
+        )
+
+        final = (users.join(final_aux, how='left', on='user_id')
+                 .fill_null(0)
+                 .sort(by=['total_points', 'perfect_points', 'correct_points', 'bet_id'], descending=True))
+
 
     else:
         final = users.with_columns(
