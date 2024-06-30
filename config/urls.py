@@ -24,6 +24,7 @@ urlpatterns = [
     path('bets', bet.views.bets, name='bets'),
     path('place_bet', bet.views.place_bet, name='place_bet'),
     path('leagues', bet.views.leagues, name='leagues'),
+    path('results', bet.views.results, name='results'),
     path('join_league/<int:league_id>', bet.views.join_league, name='join_league'),
     path('quit_league/<int:league_id>', bet.views.quit_league, name='quit_league'),
     path('__reload__/', include('django_browser_reload.urls')),

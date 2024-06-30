@@ -10,6 +10,67 @@ def compute_result(score1: int, score2: int):
     else:
         return "D"
 
+def get_results(game_id:int):
+    game_qs = Game.objects.filter(pk=game_id).values('id', 'score_team1', 'score_team2')
+    if not game_qs.exists():
+        return pl.DataFrame()
+    game = pl.from_records(list(game_qs)).rename(
+            {'id': 'game_id',
+             'score_team1': 'final_score_team1',
+             'score_team2': 'final_score_team2'}
+        )
+    users = pl.from_records(list(CustomUser.objects.all().values('id', 'email', 'first_name'))).rename({
+        'id': 'user_id'
+    })
+
+    bets_qs = Bet.objects.filter(game=game_id).values('id', 'game_id', 'league', 'user', 'score_team1', 'score_team2')
+    bets = pl.from_records(list(bets_qs)).rename({
+        'id': 'bet_id',
+        'league': 'league_id',
+        'user': 'user_id',
+        'score_team1': 'bet_score_team1',
+        'score_team2': 'bet_score_team2',
+    })
+
+    df = bets.join(game, how='left', on=['game_id'], coalesce=True)
+    df = (df.with_columns(
+        pl.struct(['final_score_team1', 'final_score_team2'])
+        .map_elements(lambda x: compute_result(x['final_score_team1'], x['final_score_team2']),
+                      return_dtype=pl.String).alias('final_result'),
+        pl.struct(['bet_score_team1', 'bet_score_team2'])
+        .map_elements(lambda x: compute_result(x['bet_score_team1'], x['bet_score_team2']),
+                      return_dtype=pl.String).alias('bet_result'))
+    .with_columns(
+        (pl.col('final_result') == pl.col('bet_result')).alias('bet_correct'))
+    .with_columns(
+        (pl.col('final_score_team1') == pl.col('bet_score_team1')).alias('bet_score1'),
+        (pl.col('final_score_team2') == pl.col('bet_score_team2')).alias('bet_score2'))
+    .with_columns(
+        (pl.col('bet_score1') & pl.col('bet_score2')).alias('bet_perfect'))
+    )
+
+    correct_bets = df.filter(pl.col('bet_correct')).select(pl.len()).item()
+    perfect_bets = df.filter(pl.col('bet_perfect')).select(pl.len()).item()
+
+    if correct_bets != 0:
+        correct_points = 1 / correct_bets * 100
+    else:
+        correct_points = 0.0
+    if perfect_bets != 0:
+        perfect_points = 1 / perfect_bets * 20
+    else:
+        perfect_points = 0.0
+
+    df = df.with_columns(
+        (pl.col('bet_correct') * correct_points).alias('correct_points'),
+        (pl.col('bet_perfect') * perfect_points).alias('perfect_points'),
+    ).with_columns((pl.col('correct_points') + pl.col('perfect_points')).alias('total_points'))
+
+    results = (users.join(df, how='left', on='user_id')
+             .fill_null(0)
+             .sort(by=['total_points', 'perfect_points', 'correct_points', 'bet_id'], descending=True))
+
+    return results
 
 def get_table(league: int = 1):
     games_qs = Game.objects.filter(score_team1__isnull=False).filter(score_team2__isnull=False).values('id', 'score_team1', 'score_team2')

@@ -1,0 +1,16 @@
+{% extends "bet/base.html" %}
+{% load custom_tags %}
+
+{% block title %}
+    MGP - Résultats
+{% endblock title %}
+
+{% block main %}
+    <div class="flex flex-col mt-2 gap-2">
+        {% for game in games %}
+            {% with game_id=game.id %}
+                {% include 'bet/components/result_card.html' with game=game bets=bets_dict|get_item:game_id %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% endblock main %}

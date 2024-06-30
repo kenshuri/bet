@@ -1,0 +1,40 @@
+<div class="mx-2 flex flex-1 justify-center">
+    <div class="card bg-base-100 shadow-xl flex flex-1 max-w-xl">
+        <div class="card-body">
+
+            <div class="card-title flex flex-col sm:flex-row sm:justify-between">
+                <div>
+                    {{ game.team_1 }} {{ game.score_team1 }} - {{ game.score_team2 }} {{ game.team_2 }}
+                </div>
+                <div class="text-sm italic">
+                    {{ game.start_datetime }}
+                </div>
+            </div>
+            <div class="overflow-x-auto flex flex-col items-center mt-2">
+                <table class="table table-fixed">
+                    <!-- head -->
+                    <thead>
+                    <tr>
+                        <th class="whitespace-normal max-w-18 sm:max-w-none" >Nom</th>
+                        <th class="whitespace-normal ">Prono</th>
+                        <th class="whitespace-normal ">Points</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for bet in bets %}
+                        <tr class="">
+                            <td class="whitespace-normal max-w-18 sm:max-w-none {% if bet.bet_perfect %}bg-green-300{% elif bet.bet_correct %}bg-green-200{% endif %}">{{ bet.first_name }}</td>
+                            {% if bet.bet_id == 0 %}
+                            <td class="whitespace-normal"><span class="mx-3.5">-</span></td>
+                            {% else %}
+                            <td class="whitespace-normal {% if bet.bet_perfect %}bg-green-300{% elif bet.bet_correct %}bg-green-200{% endif %}">{{ bet.bet_score_team1 }} - {{ bet.bet_score_team2 }}</td>
+                            {% endif %}
+                            <td class="whitespace-normal {% if bet.bet_perfect %}bg-green-300{% elif bet.bet_correct %}bg-green-200{% endif %}">{{ bet.total_points|floatformat:1 }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

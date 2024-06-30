@@ -6,7 +6,7 @@ from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm
 from bet.models import Game, Bet, CustomUser, League
 from django.utils import timezone
-from bet.utils import get_table
+from bet.utils import get_table, get_results
 
 # Create your views here.
 @login_required()
@@ -79,6 +79,17 @@ def place_bet(request):
     context = {'form': form}
     return render(request, 'bet/bets.html', context=context)
 
+@login_required
+def results(request):
+    user_leagues = League.objects.filter(users=request.user)
+    games = Game.objects.filter(score_team1__isnull=False, score_team2__isnull=False).order_by('start_datetime')
+    bets_dict = dict()
+    for game in games:
+        bets_dict[game.id] = get_results(game.id).to_dicts()
+    context = {'bets_dict': bets_dict,
+               'games': games,
+               'user_leagues':user_leagues}
+    return render(request, 'bet/results.html', context=context)
 
 @login_required
 def leagues(request):

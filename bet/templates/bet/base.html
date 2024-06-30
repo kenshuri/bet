@@ -62,9 +62,9 @@
     {% if user_leagues %}
         <div class="mt-2 flex flex-1 items-center justify-center">
             <ul class="menu menu-horizontal bg-base-200 rounded-box">
-                <li><a class="capitalize" href="{% url 'index' %}">Classement</a></li>
-                <li><a class="capitalize" href="{% url 'bets' %}">Fais tes paris</a></li>
-{#                <li><a class="btn btn-disabled">Results</a></li>#}
+                <li><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-ranking-star"></i> Classement</a></li>
+                <li><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i> Paris</a></li>
+                <li><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i>Résultats</a></li>
             </ul>
         </div>
     {% else %}
