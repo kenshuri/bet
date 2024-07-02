@@ -82,7 +82,7 @@ def place_bet(request):
 @login_required
 def results(request):
     user_leagues = League.objects.filter(users=request.user)
-    games = Game.objects.filter(score_team1__isnull=False, score_team2__isnull=False).order_by('start_datetime')
+    games = Game.objects.filter(start_datetime__lt=timezone.now()).order_by('-start_datetime')
     bets_dict = dict()
     for game in games:
         bets_dict[game.id] = get_results(game.id).to_dicts()

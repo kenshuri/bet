@@ -7,7 +7,7 @@
                     Match {{ game.euro_number }}
                 </div>
                 <div>
-                    {{ game.team_1 }} {{ game.score_team1 }} - {{ game.score_team2 }} {{ game.team_2 }}
+                    {{ game.team_1 }}  {% if game.score_team1%}{{ game.score_team1 }}{% else %}<i class="fa-solid fa-clock"></i>{% endif %} - {% if game.score_team2%}{{ game.score_team2 }}{% else %}<i class="fa-solid fa-circle-question"></i>{% endif %} {{ game.team_2 }}
                 </div>
                 <div class="text-sm italic">
                     {{ game.start_datetime }}

@@ -24,47 +24,69 @@ def get_results(game_id:int):
     })
 
     bets_qs = Bet.objects.filter(game=game_id).values('id', 'game_id', 'league', 'user', 'score_team1', 'score_team2')
-    bets = pl.from_records(list(bets_qs)).rename({
-        'id': 'bet_id',
-        'league': 'league_id',
-        'user': 'user_id',
-        'score_team1': 'bet_score_team1',
-        'score_team2': 'bet_score_team2',
-    })
+    if bets_qs.exists():
+        bets = pl.from_records(list(bets_qs)).rename({
+            'id': 'bet_id',
+            'league': 'league_id',
+            'user': 'user_id',
+            'score_team1': 'bet_score_team1',
+            'score_team2': 'bet_score_team2',
+        })
+        df = bets.join(game, how='left', on=['game_id'], coalesce=True)
+        if df.filter(pl.col('final_score_team1').is_not_null()).is_empty() == False and df.filter(pl.col('final_score_team2').is_not_null()).is_empty() == False:
+            df = (df.with_columns(
+                pl.struct(['final_score_team1', 'final_score_team2'])
+                .map_elements(lambda x: compute_result(x['final_score_team1'], x['final_score_team2']),
+                              return_dtype=pl.String).alias('final_result'),
+                pl.struct(['bet_score_team1', 'bet_score_team2'])
+                .map_elements(lambda x: compute_result(x['bet_score_team1'], x['bet_score_team2']),
+                              return_dtype=pl.String).alias('bet_result'))
+            .with_columns(
+                (pl.col('final_result') == pl.col('bet_result')).alias('bet_correct'))
+            .with_columns(
+                (pl.col('final_score_team1') == pl.col('bet_score_team1')).alias('bet_score1'),
+                (pl.col('final_score_team2') == pl.col('bet_score_team2')).alias('bet_score2'))
+            .with_columns(
+                (pl.col('bet_score1') & pl.col('bet_score2')).alias('bet_perfect'))
+            )
 
-    df = bets.join(game, how='left', on=['game_id'], coalesce=True)
-    df = (df.with_columns(
-        pl.struct(['final_score_team1', 'final_score_team2'])
-        .map_elements(lambda x: compute_result(x['final_score_team1'], x['final_score_team2']),
-                      return_dtype=pl.String).alias('final_result'),
-        pl.struct(['bet_score_team1', 'bet_score_team2'])
-        .map_elements(lambda x: compute_result(x['bet_score_team1'], x['bet_score_team2']),
-                      return_dtype=pl.String).alias('bet_result'))
-    .with_columns(
-        (pl.col('final_result') == pl.col('bet_result')).alias('bet_correct'))
-    .with_columns(
-        (pl.col('final_score_team1') == pl.col('bet_score_team1')).alias('bet_score1'),
-        (pl.col('final_score_team2') == pl.col('bet_score_team2')).alias('bet_score2'))
-    .with_columns(
-        (pl.col('bet_score1') & pl.col('bet_score2')).alias('bet_perfect'))
-    )
+            correct_bets = df.filter(pl.col('bet_correct')).select(pl.len()).item()
+            perfect_bets = df.filter(pl.col('bet_perfect')).select(pl.len()).item()
 
-    correct_bets = df.filter(pl.col('bet_correct')).select(pl.len()).item()
-    perfect_bets = df.filter(pl.col('bet_perfect')).select(pl.len()).item()
+            if correct_bets != 0:
+                correct_points = 1 / correct_bets * 100
+            else:
+                correct_points = 0.0
+            if perfect_bets != 0:
+                perfect_points = 1 / perfect_bets * 20
+            else:
+                perfect_points = 0.0
 
-    if correct_bets != 0:
-        correct_points = 1 / correct_bets * 100
+            df = df.with_columns(
+                (pl.col('bet_correct') * correct_points).alias('correct_points'),
+                (pl.col('bet_perfect') * perfect_points).alias('perfect_points'),
+            ).with_columns((pl.col('correct_points') + pl.col('perfect_points')).alias('total_points'))
+        else:
+            df = bets.with_columns(
+                pl.lit(None).cast(pl.Int64).alias('total_points'),
+                pl.lit(None).cast(pl.Int64).alias('perfect_points'),
+                pl.lit(None).cast(pl.Int64).alias('correct_points'),
+            )
     else:
-        correct_points = 0.0
-    if perfect_bets != 0:
-        perfect_points = 1 / perfect_bets * 20
-    else:
-        perfect_points = 0.0
-
-    df = df.with_columns(
-        (pl.col('bet_correct') * correct_points).alias('correct_points'),
-        (pl.col('bet_perfect') * perfect_points).alias('perfect_points'),
-    ).with_columns((pl.col('correct_points') + pl.col('perfect_points')).alias('total_points'))
+        bets = pl.DataFrame()
+        df = pl.DataFrame({
+            'user_id': None,
+            'total_points': None,
+            'perfect_points': None,
+            'correct_points': None,
+            'bet_id': None
+        }).with_columns(
+            pl.col('user_id').cast(pl.Int64),
+            pl.col('total_points').cast(pl.Int64),
+            pl.col('perfect_points').cast(pl.Int64),
+            pl.col('correct_points').cast(pl.Int64),
+            pl.col('bet_id').cast(pl.Int64)
+        )
 
     results = (users.join(df, how='left', on='user_id')
              .fill_null(0)
