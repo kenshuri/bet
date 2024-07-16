@@ -45,7 +45,7 @@ Je pense que le lien doit contenir une clé générée automatiquement à la cr�
 #### Définition du nom et de l'activité 
 - le choix de l'activité permettra de filtrer les équipes accessibles, et de faciliter le process de création de ligue en permettant d'identifier compétitions en fonction de leur type
 - les pays et les équipes custom seront toujours accessibles pour toutes les compétitions
-- on peut créer une compétion de type: mixed
+- on peut créer une compétion de type "mixed" : dans ce cas, toutes les équipes sont accessibles 
 
 #### Sélection des équipes 
 - possibilité de choisir des équipes qui existent déjà 
@@ -70,3 +70,5 @@ Une fois le modal validé, dans la création de match, on a accès aux équipes 
 - une équipe peut payer pour ajouter son équipe dans la liste des équipes "officielles" 
 
 ### RGPD!!! 
+
+### Oubli mot de passe 
