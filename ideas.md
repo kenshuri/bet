@@ -6,38 +6,61 @@
 - Tous les paris sont listés les uns après les autres en fonction de la date de démarrage du match. On peut filtrer par ligue/compétition
 
 ### Catégories accessibles depuis la page d'accueil
-- Mes Paris
+- Paris
 - Résultats: détails de tous les matchs passés 
 - Classement: classement sur les différentes ligues. Ça peut aussi être sous la forme d'un tableau/accordéon. De base t'as ta liste de ligues avec ton classement sur chacune des ligues (3/5)
 
-Depuis le menu User :
-- Gérer mes ligues : pour se desinscrire/supprimer des ligues/s'inscrire à de nouvelles Ligue 
+
+Chacune des vues ci-dessus pour reprendre exactement la même formule:
+- quelques filtres 
+- un tableau/accordéon 
+
+
+Depuis le menu User
+- Gérer mes ligues : pour se desinscrire/supprimer des ligues/s'inscrire à de nouvelles Ligue/récupérer un lien de connexion à partager 
 - Gérer mes compétitions : créer une nouvelle compétition, modifier les matchs, ajouter des matchs, indiquer les scores. Date/heure sont obligatoires pour chaque match. On doit aussi pouvoir créer des équipes 
-- Gérer mes équipes 
+- Gérer mes équipes : impossible de supprimer une équipe engagée dans une compétition 
 
 ### Création de ligue 
 
-#### Choix du tournament 
-- possibilité de choisir un tournament qui existe déjà 
-- possibilité de créer un tournament custom 
+#### Définition du nom
+
+#### Choix de competition
+- possibilité de choisir une compétition "officielle" 
+- possibilité de choisir parmi les compétitions créées par des utilisateurs : affichage du nom, de l'activité, du nombre de ligues lancées sur cette compétition
+- possibilité de créer une compétition custom 
 
 #### Choix des règles
 - activer les bonus "enjeu" : poule->pas de multiplicateur, huitième de finales -> multiplication des points par 1+1/8=1.125... 
 - activer les bonus "parfait" : 0/20/50/100
 - score avant/après prolongation 
 
-#### Création de tournament custom 
+#### Récupération lien de connexion 
+- récupération du lien de connexion (besoin d'obfusquer le lien) + code user
 
-##### Sélection des équipes 
+Je pense que le lien doit contenir une clé générée automatiquement à la création de la ligue 
+
+### Création de competition custom 
+
+#### Définition du nom et de l'activité 
+- le choix de l'activité permettra de filtrer les équipes accessibles, et de faciliter le process de création de ligue en permettant d'identifier compétitions en fonction de leur type
+- les pays et les équipes custom seront toujours accessibles pour toutes les compétitions
+- on peut créer une compétion de type: mixed
+
+#### Sélection des équipes 
 - possibilité de choisir des équipes qui existent déjà 
-- possibilité de créer des équipes ultra facilement dans le même écran 
+- possibilité de créer des équipes ultra facilement dans le même écran
 
-##### Définition des matchs
+Trop compliqué techniquement de passer la liste des équipes dans le contexte... Passer par un  Modal de création d'équipe depuis la page de définition des match. 
+Une fois le modal validé, dans la création de match, on a accès aux équipes "officielles" + équipes "custom". 
 
+#### Définition des matchs
+- Création de match avec choix d'équipes parmi les équipes officielles + custom : select2js, possibilité de classer les équipes par catégories : pays, sport foot, tennis... , custom
+- Type de match : poule, 1/64...
 
 ### Modification des `Models`
-- tournament
- - c'est le tournoi qui pointe vers les différents matchs. Chaque match pointe vers des équipes. 
+- competition
+ - c'est la compétition qui pointe vers les différents matchs. Chaque match pointe vers des équipes. 
 
 - activity: propriété d'une équipe : équipe de foot, de tennis... L'activité d'un match est définie en fonction de l'activité des deux équipes 
 
