@@ -13,3 +13,37 @@
 Depuis le menu User :
 - Gérer mes ligues : pour se desinscrire/supprimer des ligues/s'inscrire à de nouvelles Ligue 
 - Gérer mes compétitions : créer une nouvelle compétition, modifier les matchs, ajouter des matchs, indiquer les scores. Date/heure sont obligatoires pour chaque match. On doit aussi pouvoir créer des équipes 
+- Gérer mes équipes 
+
+### Création de ligue 
+
+#### Choix du tournament 
+- possibilité de choisir un tournament qui existe déjà 
+- possibilité de créer un tournament custom 
+
+#### Choix des règles
+- activer les bonus "enjeu" : poule->pas de multiplicateur, huitième de finales -> multiplication des points par 1+1/8=1.125... 
+- activer les bonus "parfait" : 0/20/50/100
+- score avant/après prolongation 
+
+#### Création de tournament custom 
+
+##### Sélection des équipes 
+- possibilité de choisir des équipes qui existent déjà 
+- possibilité de créer des équipes ultra facilement dans le même écran 
+
+##### Définition des matchs
+
+
+### Modification des `Models`
+- tournament
+ - c'est le tournoi qui pointe vers les différents matchs. Chaque match pointe vers des équipes. 
+
+- activity: propriété d'une équipe : équipe de foot, de tennis... L'activité d'un match est définie en fonction de l'activité des deux équipes 
+
+### Business/Community
+- tout le monde peut ajouter et partager ses équipes gratuitement avec une limite de : maximum 15 joueurs par ligue, maximum 2 ligues par équipe 
+- une entité peut payer pour ajouter son tournoi dans la liste des tournois "officiels" 
+- une équipe peut payer pour ajouter son équipe dans la liste des équipes "officielles" 
+
+### RGPD!!! 
