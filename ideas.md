@@ -57,6 +57,7 @@ Une fois le modal validé, dans la création de match, on a accès aux équipes 
 #### Définition des matchs
 - Création de match avec choix d'équipes parmi les équipes officielles + custom : select2js, possibilité de classer les équipes par catégories : pays, sport foot, tennis... , custom
 - Type de match : poule, 1/64...
+- Date et heure du match : obligatoire car sinon pas de pari possible. Indiquer la raison et préciser que si la date n'est pas encore connue, il faut mettre une date dans le futur qu'il faudra modifier ensuite 
 
 ### Modification des `Models`
 - competition
