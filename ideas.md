@@ -23,8 +23,6 @@ Depuis le menu User
 
 ### Création de ligue 
 
-#### Définition du nom
-
 #### Choix de competition
 - possibilité de choisir une compétition "officielle" 
 - possibilité de choisir parmi les compétitions créées par des utilisateurs : affichage du nom, de l'activité, du nombre de ligues lancées sur cette compétition
@@ -34,6 +32,8 @@ Depuis le menu User
 - activer les bonus "enjeu" : poule->pas de multiplicateur, huitième de finales -> multiplication des points par 1+1/8=1.125... 
 - activer les bonus "parfait" : 0/20/50/100
 - score avant/après prolongation 
+
+#### Définition du nom
 
 #### Récupération lien de connexion 
 - récupération du lien de connexion (besoin d'obfusquer le lien) + code user
