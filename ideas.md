@@ -62,7 +62,9 @@ Une fois le modal validé, dans la création de match, on a accès aux équipes 
 - competition
  - c'est la compétition qui pointe vers les différents matchs. Chaque match pointe vers des équipes. 
 
-- activity: propriété d'une équipe : équipe de foot, de tennis... L'activité d'un match est définie en fonction de l'activité des deux équipes 
+- activity: propriété d'une équipe et d'une compétition : foot, tennis... Lorsqu'on crée une compétition et qu'on doit choisir les équipes, on a la liste des équipes nationales + celles de l'activité de la compétition 
+
+- game : type de match (poule, 1/2...) pour application des bonus 
 
 ### Business/Community
 - tout le monde peut ajouter et partager ses équipes gratuitement avec une limite de : maximum 15 joueurs par ligue, maximum 2 ligues par équipe 
