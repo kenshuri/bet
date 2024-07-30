@@ -1,3 +1,5 @@
+# Deadline ligue des champions 17/09/25
+
 # Ideas v2
 
 - Création de ligue custom : possibilité de créer ses propres match, propres équipes, propres résultats. En fait on devrait même pouvoir créer une compétition custom, et autant de ligue branchées sur ces compétitions->Angle collaboratif, chacun peut créer une compétition custom, et n'importe qui créer sa ligue sur cette compétition-> ouverture à tout type de pari
