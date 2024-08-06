@@ -6,8 +6,6 @@
 
 {% block main %}
     <div class="flex flex-col mt-2 gap-2">
-    {% for bet_form in upcoming_bets %}
-        {% include 'bet/forms/bet_form.html' with bet_form=bet_form %}
-    {% endfor %}
+    {% include 'bet/components/bet_table.html' with bets=upcoming_bets %}
     </div>
 {% endblock main %}

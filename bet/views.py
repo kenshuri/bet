@@ -1,12 +1,17 @@
+import plistlib
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 
+import polars as pl
+
 from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm
-from bet.models import Game, Bet, CustomUser, League
+from bet.models import Game, Bet, CustomUser, League, Competition
 from django.utils import timezone
-from bet.utils import get_table, get_results
+from bet.utils import get_table, get_results, Result
+
 
 # Create your views here.
 @login_required()
@@ -25,26 +30,38 @@ def index(request):
 
 @login_required
 def bets(request):
-    user_leagues = League.objects.filter(users=request.user)
-    league = League.objects.all()[:1].get()
-    league_id = league.id
-    upcoming_games = list(Game.objects.filter(start_datetime__gt=timezone.now()).order_by('start_datetime').values_list('pk', flat=True))
-    existing_bets = Bet.objects.filter(league_id=league_id).filter(user=request.user).filter(game__in=upcoming_games)
+    user_leagues = League.objects.filter(users=request.user).values('id').distinct()
+    user_competitions = League.objects.filter(users=request.user).values('competition_id').distinct()
+    # league = League.objects.all()[:1].get()
+    # league_id = league.id
+    upcoming_games = Game.objects.filter(start_datetime__gt=timezone.now()).filter(competition__in=user_competitions).order_by('start_datetime')
+    existing_bets = Bet.objects.filter(user=request.user).filter(league__in=user_leagues).filter(game__in=upcoming_games)
+    # upcoming_games_list = list(upcoming_games.values_list('id', flat=True))
+    user_leagues_list = list(user_leagues.values_list('id', flat=True))
     upcoming_bets = list()
-    for game_id in upcoming_games:
-        if game_id in existing_bets.values_list('game_id', flat=True):
-            # Create a Bet form based on values of existing Bet
-            bet_form = BetForm(instance=existing_bets.get(game_id=game_id))
-        else:
-            # Create a new Bet form using the information in Game
-            game = get_object_or_404(Game, pk=game_id)
-            bet_form = BetForm(instance=Bet(
-                game = game,
-                league = league,
-                user = request.user,
-            ))
-        upcoming_bets.append(bet_form)
-    context = {'upcoming_games': upcoming_games,
+    for league_id in user_leagues_list:
+        user_lg_competition = League.objects.filter(id=league_id).values('competition_id').distinct()
+        upcoming_games_lg = Game.objects.filter(start_datetime__gt=timezone.now()).filter(competition__in=user_lg_competition).order_by('start_datetime')
+        upcoming_games_lg_list = list(upcoming_games_lg.values_list('id', flat=True))
+        for game_id in upcoming_games_lg_list:
+            if existing_bets.filter(game=game_id).filter(league=league_id).exists():
+                # Create a Bet form based on values of existing Bet
+                bet_form = BetForm(instance=existing_bets.get(game=game_id, league=league_id))
+            else:
+                # Create a new Bet form using the information in Game & League
+                game = get_object_or_404(Game, pk=game_id)
+                league = get_object_or_404(League, pk=league_id)
+                bet_form = BetForm(instance=Bet(
+                    game = game,
+                    league = league,
+                    user = request.user,
+                ))
+            upcoming_bets.append(bet_form)
+    upcoming_bets_sorted = upcoming_bets.sort(key=lambda x: (x.instance.game.start_datetime,
+                                                             x.instance.game.competition.id,
+                                                             x.instance.league.id))
+    context = {
+        # 'upcoming_games': upcoming_games_list,
                'existing_bets': existing_bets,
                'upcoming_bets': upcoming_bets,
                'user_leagues': user_leagues}
@@ -79,16 +96,41 @@ def place_bet(request):
     context = {'form': form}
     return render(request, 'bet/bets.html', context=context)
 
+
+
 @login_required
 def results(request):
+    """
+    For each each league, get the competition, then all games started for this competition, and finally, for each game/compet/league, compute the results
+
+    The HTML template requires:
+    - list of all league/competition/game & result
+    Parameters
+    ----------
+    request
+
+    Returns
+    -------
+
+    """
     user_leagues = League.objects.filter(users=request.user)
+    user_leagues_list = list(user_leagues.values_list('id', flat=True))
+    results = list()
+    for league_id in user_leagues_list:
+        user_lg_competition = League.objects.filter(id=league_id).values('competition_id').distinct()
+        started_games_lg = Game.objects.filter(start_datetime__lt=timezone.now()).filter(competition__in=user_lg_competition).order_by('-start_datetime')
+        started_games_lg_list = list(started_games_lg.values_list('id', flat=True))
+        for game_id in started_games_lg_list:
+            results.append(Result(league_id, game_id, request.user.id))
+
     games = Game.objects.filter(start_datetime__lt=timezone.now()).order_by('-start_datetime')
     bets_dict = dict()
     for game in games:
         bets_dict[game.id] = get_results(game.id).to_dicts()
     context = {'bets_dict': bets_dict,
                'games': games,
-               'user_leagues':user_leagues}
+               'user_leagues':user_leagues,
+               'results': results}
     return render(request, 'bet/results.html', context=context)
 
 @login_required

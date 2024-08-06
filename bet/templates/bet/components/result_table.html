@@ -1,0 +1,163 @@
+<div x-data class="flex flex-col text-sm sm:text-base">
+    <div class="p-2 flex font-bold border-b-2">
+        <div class="w-24">
+            <div class="flex flex-row gap-0.5 items-center">
+                <div class="badge badge-primary badge-sm">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <span>/</span>
+                <div class="badge badge-secondary badge-sm">
+                    <i class="fa-solid fa-meteor"></i>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-grow justify-center">
+            Match
+        </div>
+        <div class="w-16 sm:w-24 flex justify-center">Points</div>
+        <div class="w-4 sm:w-24"></div>
+    </div>
+    {% for r in results %}
+        <div x-disclosure class="p-1 border-b">
+            {#        Result Summary#}
+            <div x-disclosure:button class="" :class="$disclosure.isOpen && 'bg-base-200'">
+                <div class="flex">
+                    <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
+                    <span class="badge badge-primary">
+                        {{ r.game.competition.sn}}
+                    </span>
+                        <span class="badge badge-secondary">
+                        {{ r.league.sn }}
+                    </span>
+                    </div>
+                    <div class="flex flex-grow p-1 pt-0 flex-col gap-0.5">
+                        <div class="flex justify-center">
+                            <div class="badge badge-sm flex gap-2 m-1 sm:badge-md">
+                                <i class="fa-solid fa-clock"></i>
+                                {{ r.game.start_datetime|date:'d/m/y'}} {{ r.game.start_datetime|date:'H:i'}}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-2">
+                            <div class="flex flex-grow gap-1">
+                                <div class="flex flex-grow items-center sm:justify-end">
+                                    {{ r.game.team_1 }}
+                                </div>
+                                <div class="rounded p-1 border {% if not r.game.score_team1 >= 0 %}  {% elif r.game.score_team1 > r.game.score_team2 %} bg-success border-success-content text-success-content {% elif r.game.score_team1 < r.game.score_team2 %} bg-error border-error-content text-error-content {% elif r.game.score_team1 == r.game.score_team2 %} bg-warning border-warning-content text-warning-content {% endif %}">
+                                    {% if r.game.score_team1 >= 0%}
+                                        {{ r.game.score_team1 }}
+                                    {% else %}
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex flex-grow gap-1 sm:flex-row-reverse">
+                                <div class="flex flex-grow items-center">
+                                    {{ r.game.team_2 }}
+                                </div>
+                                <div class="rounded p-1 border {% if not r.game.score_team1 >= 0 %}  {% elif r.game.score_team1 < r.game.score_team2 %} bg-success border-success-content text-success-content {% elif r.game.score_team1 > r.game.score_team2 %} bg-error border-error-content text-error-content {% elif r.game.score_team1 == r.game.score_team2 %} bg-warning border-warning-content text-warning-content {% endif %}">
+                                    {% if r.game.score_team2 >= 0%}
+                                        {{ r.game.score_team2 }}
+                                    {% else %}
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-16 sm:w-24 place-content-center flex p-1 font-bold justify-center items-center">
+                        {{ r.user_score }}
+                    </div>
+                    <div class="w-4 sm:w-24 p-1 flex flex-col items-center justify-center sm:flex-row sm:gap-1">
+                    <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </span>
+                        <span x-show="! $disclosure.isOpen" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+                    </div>
+                </div>
+            </div>
+            {#            Result Details#}
+            <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+                <div class="flex flex-col p-1 bg-base-200">
+                    <div class="flex justify-between">
+                        <div class="badge badge-neutral flex gap-2 m-1">
+                            <i class="fa-solid fa-square-poll-horizontal"></i>
+                            Pronostics
+                        </div>
+                    </div>
+
+                    <table class="table table-xs sm:table-sm">
+                        <thead>
+                        <tr>
+                            <th>
+                                Joueur
+                            </th>
+                            <th>
+                                Prono
+                            </th>
+                            <th>
+                                Points
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                        {% for rd in r.result_list %}
+                            <tr class="{% if rd.bet_perfect %} bg-green-300 {% elif rd.bet_correct %} bg-green-200 {% elif rd.bet_exists == False %} bg-gray-200 {% endif %} {% if rd.user_id == request.user.id %} font-bold {% endif %}">
+                                <td>
+                                    {{ rd.first_name }}
+                                </td>
+                                <td>
+                                    {% if rd.bet_score_team1 >= 0 %}
+                                        {{ rd.bet_score_team1 }} -
+                                        {{ rd.bet_score_team2 }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+
+                                    {{ rd.total_points |floatformat:1}}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="flex flex-col gap-1 mb-1 sm:flex-row sm:mb-2">
+                    <div class="flex flex-col gap-1 bg-primary-content rounded p-1 mx-1 border border-primary sm:w-1/2 sm:p-2">
+                        <div class="badge badge-primary">
+                            <i class="fa-solid fa-trophy"></i>
+                            <span class="ml-2">Compétition</span>
+                        </div>
+                        <div class="font-bold">
+                            {{ r.game.competition }}
+                        </div>
+                        <div>
+                            Type de match: {{ r.game_type }}
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary sm:w-1/2 sm:p-2">
+                        <div class="badge badge-secondary">
+                            <i class="fa-solid fa-meteor"></i>
+                            <span class="ml-2">Ligue</span>
+                        </div>
+                        <div class="font-bold">
+                            {{ r.league }}
+                        </div>
+                        <div>
+                            Bonus "Enjeu": {{ r.league.bonus_stake }}
+                        </div>
+                        <div>
+                            Bonus "Parfait": {{ r.league.bonus_perfect }}
+                        </div>
+                        <div>
+                            Score après-prolongation: {{ r.league.with_ext }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

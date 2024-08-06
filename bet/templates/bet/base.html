@@ -10,7 +10,10 @@
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
     <script src="https://unpkg.com/htmx.org@1.8.0" integrity="sha384-cZuAZ+ZbwkNRnrKi05G/fjBX+azI9DNOkNYysZ0I/X5ZFgsmMiBXgDZof30F5ofc" crossorigin="anonymous" defer></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@alpinejs/ui@3.14.1-beta.0/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.1/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <title>
         {% block title %}
         {% endblock title %}
@@ -18,79 +21,93 @@
 </head>
 <body class="bg-base-100">
 <header>
-    <div class="flex bg-base-100 max-w-3xl mx-auto lg:max-w-4xl xl:max-w-6xl justify-between gap-2">
-        <div class="flex flex-1">
-            <a class="gap-1 flex items-center" href="{% url 'index' %}">
-                <div class="">
-                    <div class="w-16 md:w-20 m-1">
-                        <img alt="logo" src="{% static 'mgp-Kittl.svg' %}" />
-                    </div>
-                </div>
-                <span class="flex font-bold text-base md:text-xl">Mon GROS prono</span>
-            </a>
-        </div>
-        <div class="flex flex-2 gap-2 items-center mr-2">
-            {% if user.is_authenticated %}
-                <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-active" aria-label="utilisateur">
-                        <i class="fa-regular fa-user"></i>
-                    </div>
-                    <ul tabindex="0" class="mt-3 z-[1] p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                        <li class="p-2 underline">
-                            {{ user.email }}
-                        </li>
-                        <form method="post" action="{% url 'logout' %}">
-                            <li>
-                                {% csrf_token %}
-                                <button type="submit" aria-label="se déconnecter">
-                                    <i class="fa-solid fa-right-from-bracket"></i>
-                                    Déconnexion
-                                </button>
-                                <input type="hidden" name="next" value="{% url 'index'%}">
-                            </li>
-                        </form>
-                    </ul>
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-sm btn-circle btn-outline" aria-label="se connecter">
-                    <i class="fa-regular fa-user"></i>
-                </a>
-            {% endif %}
-        </div>
-</header>
-<main class="min-h-screen max-w-3xl mx-auto lg:max-w-4xl xl:max-w-6xl place-content-start">
-
-    {% if user_leagues %}
-        <div class="mt-2 flex flex-1 items-center justify-center">
-            <ul class="menu menu-horizontal bg-base-200 rounded-box">
-                <li><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-ranking-star"></i> Classement</a></li>
-                <li><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i> Paris</a></li>
-                <li><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i>Résultats</a></li>
-            </ul>
-        </div>
-    {% else %}
-        <div class="flex flex-1 flex-col gap-2">
-            {% for league in all_leagues %}
-                <div class="flex flex-1 justify-center">
-                    <div class="card bg-base-100 shadow-xl max-w-xl flex-1 mx-2">
-                        <div class="card-body">
-                            <h2 class="card-title">{{ league.name }}</h2>
-                            {% if request.user in league.users.all %}
-                                <p>You're in this league.</p>
-                                <div class="card-actions justify-end">
-                                    <a href="{% url 'quit_league' league.id %}" class="btn btn-error">quit league</a>
-                                </div>
-                            {% else %}
-                                <div class="card-actions justify-end">
-                                    <a href="{% url 'join_league' league.id %}" class="btn btn-success">join league</a>
-                                </div>
-                            {% endif %}
+    <div class="flex flex-col mx-auto max-w-3x lg:max-w-4xl xl:max-w-6xl">
+        {#    Title Bar  #}
+        <div class="flex justify-between items-center">
+            <div class="flex">
+                <a class="gap-1 flex items-center" href="{% url 'index' %}">
+                    <div class="">
+                        <div class="w-16 md:w-20 m-1">
+                            <img alt="logo" src="{% static 'mgp-Kittl.svg' %}" />
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                    <span class="flex font-bold text-base md:text-xl">Mon GROS prono</span>
+                </a>
+            </div>
+            <div class="flex mr-2 ">
+                {% if user.is_authenticated %}
+                    <div x-data x-popover class="relative ml-2">
+                        <button x-popover:button class="btn btn-sm btn-circle btn-active" aria-label="utilisateur">
+                            <i class="fa-regular fa-user"></i>
+                        </button>
+                        <div x-popover:panel
+                             x-cloak
+                             x-transition.origin.top.right
+                             class="absolute right-0 top-8 mt-2 w-52 bg-white rounded-md shadow-2xl z-10">
+                            <ul class="menu">
+                                <li class="p-2 underline mb-2">
+                                    {{ user.email }}
+                                </li>
+                                <li><a><i class="fa-solid fa-user-pen"></i>Mon profil</a></li>
+                                <form method="post" action="{% url 'logout' %}">
+                                    <li>
+                                        {% csrf_token %}
+                                        <button type="submit" aria-label="se déconnecter">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                            Déconnexion
+                                        </button>
+                                        <input type="hidden" name="next" value="{% url 'index'%}">
+                                    </li>
+                                </form>
+                            </ul>
+
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-sm btn-circle btn-outline" aria-label="se connecter">
+                        <i class="fa-regular fa-user"></i>
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    {% endif %}
+        {% if user.is_authenticated %}
+            {#    Navigation bar    #}
+            <div x-data x-popover class="relative ml-2">
+                <ul class="join">
+                    <li x-popover:button class="btn btn-neutral join-item dropdown flex items-center"><i class="fa-solid fa-bars"></i>
+                    </li>
+                    <div x-popover:panel
+                         x-cloak
+                         x-transition.origin.top.left
+                         class="absolute left-0 top-12 mt-2 w-40 bg-white rounded-md shadow-2xl z-10">
+                        <ul class="menu bg-base-100 rounded-box w-60 p-2 shadow">
+                            <li>
+                                <h2 class="menu-title"><i class="fa-solid fa-gamepad mr-2"></i>Jouer</h2>
+                                <ul>
+                                    <li><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-ranking-star"></i>Classement</a></li>
+                                    <li><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i>Paris</a></li>
+                                    <li><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i>Résultats</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <h2 class="menu-title"><i class="fa-solid fa-wrench mr-2"></i>Gérer</h2>
+                                <ul>
+                                    <li><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-meteor"></i></i>Mes ligues</a></li>
+                                    <li><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-trophy"></i>Mes compétitions</a></li>
+                                    <li><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-people-group"></i></i>Mes équipes</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-ranking-star"></i> Classement</a></li>
+                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i> Paris</a></li>
+                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Résultats</a></li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</header>
+<main class="min-h-screen flex flex-col mx-auto max-w-3xl lg:max-w-4xl xl:max-w-6xl place-content-start">
     {%  block main %}
     {%  endblock main %}
 </main>

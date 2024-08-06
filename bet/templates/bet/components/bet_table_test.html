@@ -1,0 +1,89 @@
+<div x-data class="overflow-x-auto">
+    <table class="table table-sm table-fixed sm:table-md">
+        <thead>
+        <tr>
+            <th class="w-16 sm:w-24 sm:text-base">Date</th>
+            <th class="w-24">
+                <div class="flex flex-row gap-0.5">
+                    <div class="badge badge-primary">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div class="badge badge-secondary">
+                        <i class="fa-solid fa-meteor"></i>
+                    </div>
+                </div>
+            </th>
+            <th>
+                <div class="flex justify-center sm:text-base">
+                    Match
+                </div>
+            </th>
+            <th class="w-4 sm:w-20"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for bet_form in bets %}
+                <tr>
+                    <form action="{% url 'place_bet' %}" method="post">
+                        {% csrf_token %}
+                        <td class="italic">
+                            <div class="flex flex-col">
+                                {{ bet_form.instance.game.start_datetime | date:"d/m/y" }}
+                                {{ bet_form.instance.game.start_datetime | time:"H:i" }}
+                            </div>
+                        <td>
+                            <div class="flex flex-col gap-0.5">
+                        <span class="badge badge-primary">
+                            {{ bet_form.instance.game.competition.sn}}
+                        </span>
+                                <span class="badge badge-secondary">
+                            {{ bet_form.instance.league.sn }}
+                        </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-0.5">
+                                <div class="col-span-2 flex items-center sm:justify-end sm:text-base">
+                                    {{ bet_form.instance.game.team_1 }}
+                                </div>
+                                <div class="flex justify-center">
+                                    <div class="form-control">
+                                        <label class="label hidden" for="id_score_team1"></label>
+                                        <input required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
+                                               name="score_team1" id="id_score_team1" value="{{ bet_form.instance.score_team1 }}"/>
+                                    </div>
+                                </div>
+                                <div class="col-span-2 sm:hidden flex items-center">
+                                    {{ bet_form.instance.game.team_2 }}
+                                </div>
+                                <div class="flex justify-center">
+                                    <div class="form-control">
+                                        <label class="label hidden" for="id_score_team2"></label>
+                                        <input required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
+                                               name="score_team2" id="id_score_team2" value="{{ bet_form.instance.score_team2 }}"/>
+                                    </div>
+                                </div>
+                                <div class="hidden sm:flex items-center sm:col-span-2 sm:text-base">
+                                    {{ bet_form.instance.game.team_2 }}
+                                </div>
+                            </div>
+                        </td>
+                        <div>
+                            {{ bet_form.game.as_hidden }}
+                            {{ bet_form.league.as_hidden }}
+                        </div>
+                        <td class="p-0">
+                            <div class="flex flex-col gap-0.5 sm:flex-row sm:gap-1">
+                                <button class="btn btn-circle btn-xs" type="submit"><i class="fa-solid fa-gavel"></i></button>
+                                <button x-disclosure:button class="btn btn-circle btn-xs"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </td>
+                    </form>
+                </tr>
+                <tr x-disclosure:panel>
+                    <td colspan="4"><div class="flex flex-grow justify-end">{{ bet_form.instance.game.team_2 }}</div></td>
+                </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
