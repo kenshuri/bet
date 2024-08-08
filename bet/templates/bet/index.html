@@ -6,33 +6,8 @@
 
 {% block main %}
     {% if user_leagues %}
-        <div class="flex flex-1 justify-center mt-2">
-
-            <div class="overflow-x-auto">
-                <table class="table table-fixed">
-                    <!-- head -->
-                    <thead>
-                    <tr>
-                        <th class="whitespace-normal max-w-18 sm:max-w-none" >Nom</th>
-                        <th class="whitespace-normal max-w-16 sm:max-w-none">Paris</th>
-                        <th class="whitespace-normal max-w-16 sm:max-w-none"><span class="hidden md:inline">Paris </span>Justes</th>
-                        <th class="whitespace-normal max-w-16 sm:max-w-none"><span class="hidden md:inline">Paris </span>Parfaits</th>
-                        <th class="whitespace-normal max-w-16 sm:max-w-none">Points</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for u in table_dict %}
-                        <tr class="">
-                            <td class="whitespace-normal max-w-18 sm:max-w-none">{{ u.first_name }}</td>
-                            <td class="whitespace-normal max-w-16 sm:max-w-none">{{ u.bet_id }}</td>
-                            <td class="whitespace-normal max-w-16 sm:max-w-none ">{{ u.bet_correct }}</td>
-                            <td class="whitespace-normal max-w-16 sm:max-w-none ">{{ u.bet_perfect }}</td>
-                            <td class="whitespace-normal max-w-16 sm:max-w-none ">{{ u.total_points | floatformat:1 }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="flex flex-col mt-2 gap-2">
+        {% include 'bet/components/ranking_table.html' with rankings=rankings %}
         </div>
     {% endif %}
 {% endblock main %}

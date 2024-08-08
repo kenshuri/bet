@@ -127,14 +127,147 @@ def game_result(league_id:int, game_id:int, user_id:int):
         )
 
     result_df = (players_df.join(df, how='left', on='user_id', coalesce=True)
-               .with_columns(pl.col('total_points').fill_null(0),
-                             pl.col('bet_exists').fill_null(False).cast(pl.Boolean))
-               .sort(by=['total_points', 'bet_exists', 'first_name', 'bet_id'],
-                     descending=[True, True, False, False]))
+                 .with_columns(pl.col('total_points').fill_null(0),
+                               pl.col('bet_correct').fill_null(False).cast(pl.Boolean),
+                               pl.col('bet_perfect').fill_null(False).cast(pl.Boolean),
+                               pl.col('bet_exists').fill_null(False).cast(pl.Boolean))
+                 .sort(by=['total_points', 'bet_exists', 'first_name', 'bet_id'],
+                       descending=[True, True, False, False]))
 
     user_score = result_df.filter(user_id=user_id).select('total_points').item()
 
     return result_df, user_score
+
+
+
+def league_ranking(league_id:int, user_id:int):
+    """
+    POur calculer le ranking d'une league, il faut:
+        Récupérer tous les jouers inscrits sur cette league
+        Récupérer tous les matchs définis sur la compétition de cette league pour lesquels les score définitifs sont disponibles
+            Pour chaque match -->
+            Récupérer tous les bets des joueurs inscrits
+            Calculer les points de l'ensemble des joueurs pour un match
+            Stocker les derniers résultats du user
+        Faire la somme des points pour chaque match
+        Récupérer les points totals du user
+
+    Parameters
+    ----------
+    league_id
+    user_id
+
+    Returns
+    -------
+
+    """
+    users = CustomUser.objects.filter(lg_users__in=[league_id]).distinct()
+    competition = League.objects.filter(id=league_id).values('competition')
+    games = Game.objects.filter(competition__in=competition).filter(score_team1__isnull=False).filter(score_team2__isnull=False).values('id')
+
+    games_results_list = list()
+    last_results_list = list()
+    ranking = pl.DataFrame({
+        'user_id': [u.id for u in users],
+        'first_name': [u.first_name for u in users],
+        'email': [u.email for u in users],
+    })
+    ranking = ranking.with_columns(
+        pl.lit(0).alias('bets_number'),
+        pl.lit(0).alias('bets_ok'),
+        pl.lit(0).alias('bets_perfect'),
+        pl.lit(0).alias('user_score').cast(pl.Float64),
+    )
+    user_score = 0
+    for g in games:
+        g_result_df, u_score = game_result(league_id=league_id, game_id=g['id'], user_id=user_id)
+        # g_result_df = g_result_df.with
+        ranking = ranking.join(g_result_df.select('user_id', 'bet_exists', 'bet_correct', 'bet_perfect', 'total_points'),
+                               how='left', on='user_id', coalesce=True).with_columns(
+            (pl.col('bets_number') + pl.col('bet_exists').cast(pl.Int64)).alias('bets_number'),
+            (pl.col('bets_ok') + pl.col('bet_correct').cast(pl.Int64)).alias('bets_ok'),
+            (pl.col('bets_perfect') + pl.col('bet_perfect').cast(pl.Int64)).alias('bets_perfect'),
+            (pl.col('user_score') + pl.col('total_points').cast(pl.Int64)).alias('user_score'),
+        ).select(
+            'first_name', 'user_id', 'email', 'bets_number', 'bets_ok', 'bets_perfect', 'user_score'
+        )
+        user_score += u_score
+        games_results_list.append(g_result_df)
+        l_result = 0
+        if g_result_df.filter(pl.col('user_id') == user_id).select('bet_perfect').item() == True:
+            l_result = 3 # Perfect
+        elif g_result_df.filter(pl.col('user_id') == user_id).select('bet_correct').item() == True:
+            l_result = 2 # Correct
+        elif g_result_df.filter(pl.col('user_id') == user_id).select('bet_exists').item() == True:
+            l_result = 1  # Wrong
+        else:
+            l_result = 0  # No bet
+        last_results_list.append(l_result)
+    ranking = ranking.sort('user_score', 'bets_ok', descending=True)
+    ranking = ranking.with_columns(
+        pl.col('user_score').rank(method='min', descending=True).alias('user_rank'),
+    )
+
+    if len(last_results_list) < 5:
+        last_results_list = [*[-1 for x in range(5-len(last_results_list))], *last_results_list]
+
+    user_rank = ranking.filter(pl.col('user_id')==user_id).select('user_rank').item()
+
+    return ranking, last_results_list[-4:], user_score, user_rank
+
+
+class RankingDetail:
+    user_id: int
+    first_name: str
+    bets_number: int
+    bets_ok: int
+    bets_perfect: int
+    user_score: float
+
+    def __init__(self, user_id: int, user_rank: int, first_name: str, bets_number: int, bets_ok: int, bets_perfect: int, user_score: float):
+        self.user_id = user_id
+        self.user_rank = user_rank
+        self.first_name = first_name
+        self.bets_number = bets_number
+        self.bets_ok = bets_ok
+        self.bets_perfect = bets_perfect
+        self.user_score = user_score
+
+class Ranking:
+    user: CustomUser
+    league: League
+    last_results: list[int]
+    ranking_df: pl.DataFrame
+    user_score: float
+    ranking_list: list[RankingDetail]
+    user_rank = int
+
+    def __init__(self, user_id: int, league_id: int):
+        self.user = CustomUser.objects.get(id=user_id)
+        self.league = League.objects.get(id=league_id)
+
+        ranking_df, last_results, user_score, user_rank = league_ranking(league_id, user_id)
+
+        self.ranking_df = ranking_df
+        self.last_results = last_results
+        self.user_score = user_score
+        self.user_rank = user_rank
+
+        rl = list()
+        for rd in ranking_df.iter_rows(named=True):
+            rl.append(RankingDetail(
+                user_id=rd['user_id'],
+                user_rank=rd['user_rank'],
+                first_name=rd['first_name'],
+                bets_number=rd['bets_number'],
+                bets_ok=rd['bets_ok'],
+                bets_perfect=rd['bets_perfect'],
+                user_score=rd['user_score']
+            ))
+
+        self.ranking_list = rl
+
+
 
 
 class ResultDetail:
@@ -196,10 +329,10 @@ def get_results(game_id:int):
     if not game_qs.exists():
         return pl.DataFrame()
     game = pl.from_records(list(game_qs)).rename(
-            {'id': 'game_id',
-             'score_team1': 'final_score_team1',
-             'score_team2': 'final_score_team2'}
-        )
+        {'id': 'game_id',
+         'score_team1': 'final_score_team1',
+         'score_team2': 'final_score_team2'}
+    )
     users = pl.from_records(list(CustomUser.objects.all().values('id', 'email', 'first_name'))).rename({
         'id': 'user_id'
     })
@@ -270,8 +403,8 @@ def get_results(game_id:int):
         )
 
     results = (users.join(df, how='left', on='user_id')
-             .fill_null(0)
-             .sort(by=['total_points', 'perfect_points', 'correct_points', 'bet_id'], descending=True))
+               .fill_null(0)
+               .sort(by=['total_points', 'perfect_points', 'correct_points', 'bet_id'], descending=True))
 
     return results
 

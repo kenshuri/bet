@@ -10,21 +10,25 @@ from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm
 from bet.models import Game, Bet, CustomUser, League, Competition
 from django.utils import timezone
-from bet.utils import get_table, get_results, Result
+from bet.utils import get_table, get_results, Result, Ranking
 
 
 # Create your views here.
 @login_required()
 def index(request):
-    # all_leagues = League.objects.all()
-    all_leagues = League.objects.filter(pk=1)
+    all_leagues = League.objects.filter(id=1)
     user_leagues = League.objects.filter(users=request.user)
+    rankings = list()
+    for league in user_leagues:
+        rankings.append(Ranking(user_id=request.user.id, league_id=league.id))
+
     table_df = get_table()
     context = {
         'all_leagues': all_leagues,
         'user_leagues': user_leagues,
         'league_id': 1,
         'table_dict': table_df.to_dicts(),
+        'rankings': rankings,
     }
     return render(request, 'bet/index.html', context=context)
 

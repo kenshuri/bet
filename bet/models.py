@@ -90,7 +90,7 @@ class League(models.Model):
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=5, null=True, blank=True)
     owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0, related_name='lg_owner')
-    users = models.ManyToManyField(CustomUser, related_name='users')
+    users = models.ManyToManyField(CustomUser, related_name='lg_users')
     competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='lg_competition')
     bonus_stake = models.IntegerField(choices=StakeChoice.choices)
     bonus_perfect = models.IntegerField(choices=PerfectChoice.choices)

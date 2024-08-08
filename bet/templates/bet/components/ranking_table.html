@@ -1,0 +1,174 @@
+<div x-data class="flex flex-col text-sm sm:text-base">
+    {#    Header        #}
+    <div class="p-2 flex font-bold border-b-2">
+        <div class="w-24">
+            <div class="flex flex-row gap-0.5 items-center">
+                <div class="badge badge-primary badge-sm">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <span>/</span>
+                <div class="badge badge-secondary badge-sm">
+                    <i class="fa-solid fa-meteor"></i>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-grow justify-center">
+            Ligue
+        </div>
+        <div class="w-16 sm:w-24"></div>
+    </div>
+    {% for r in rankings %}
+        <div x-disclosure class="p-1 border-b">
+            {#        Ranking Summary#}
+            <div x-disclosure:button class="" :class="$disclosure.isOpen && 'bg-base-200'">
+                <div class="flex">
+                    <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
+                    <span class="badge badge-primary">
+                        {{ r.league.competition.sn}}
+                    </span>
+                        <span class="badge badge-secondary">
+                        {{ r.league.sn }}
+                    </span>
+                    </div>
+                    <div class="flex flex-col flex-grow gap-1">
+                        <div class="flex flex-grow">
+                            <div class="flex w-2/3 p-1 gap-1 justify-center">
+                                {% for lr in r.last_results %}
+                                    {% if lr == 0 %}
+                                        <span class="flex items-center p-1 border rounded">
+                                               <i class="fa-solid fa-ban"></i>
+                                        </span>
+                                    {% elif lr == 1 %}
+                                        <span class="flex items-center p-1 bg-error border border-error-content text-error-content rounded">
+                                               <i class="fa-solid fa-xmark"></i>
+                                        </span>
+                                    {% elif lr == 2 %}
+                                        <span class="flex items-center p-1 bg-green-300 border border-success text-success-content rounded">
+                                               <i class="fa-solid fa-check"></i>
+                                        </span>
+                                    {% elif lr == 3 %}
+                                        <span class="flex items-center p-1 bg-green-500 border border-success text-success-content rounded">
+                                               <i class="fa-solid fa-check-double"></i>
+                                        </span>
+                                    {% else %}
+                                        <span class="flex items-center p-1 border rounded">
+                                            <i class="fa-solid fa-minus"></i>
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="flex flex-col w-1/3 gap-1 justify-end">
+                                <div class="flex gap-1">
+                                    <span class="w-5"><i class="fa-solid fa-medal"></i></span>
+                                    <span class="font-semibold">{{ r.user_score }}</span>
+                                </div>
+                                <div class="flex gap-1">
+                                    <span class="w-5"><i class="fa-solid fa-ranking-star"></i></span>
+                                    <span class="font-semibold">{{ r.user_rank }}</span><span>/</span><span>{{ r.ranking_list|length }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-4 sm:w-24 p-1 flex flex-col items-center justify-center sm:flex-row sm:gap-1">
+                        <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true">
+                            <i class="fa-solid fa-chevron-up"></i>
+                        </span>
+                        <span x-show="! $disclosure.isOpen" aria-hidden="true">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {#            Ranking Details#}
+            <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+                <div class="flex flex-col p-1 bg-base-200">
+                    <div class="flex justify-between">
+                        <div class="badge badge-neutral flex gap-2 m-1">
+                            <i class="fa-solid fa-ranking-star"></i>
+                            Classement
+                        </div>
+                    </div>
+
+                    <table class="table table-xs sm:table-sm">
+                        <thead>
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>
+                                Joueur
+                            </th>
+                            <th>
+                                Paris
+                            </th>
+                            <th>
+                                Justes
+                            </th>
+                            <th>
+                                Parfaits
+                            </th>
+                            <th>
+                                Points
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                        {% for rd in r.ranking_list %}
+                            <tr class="{% if rd.user_id == request.user.id %} font-bold {% endif %}">
+                                <td>
+                                    {{ rd.user_rank }}
+                                </td>
+                                <td>
+                                    {{ rd.first_name }}
+                                </td>
+                                <td>
+                                    {{ rd.bets_number }}
+                                </td>
+                                <td>
+                                    {{ rd.bets_ok }}
+                                </td>
+                                <td>
+                                    {{ rd.bets_perfect }}
+                                </td>
+                                <td>
+                                    {{ rd.user_score |floatformat:1}}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="flex flex-col gap-1 mb-1 sm:flex-row sm:mb-2">
+                    <div class="flex flex-col gap-1 bg-primary-content rounded p-1 mx-1 border border-primary sm:w-1/2 sm:p-2">
+                        <div class="badge badge-primary">
+                            <i class="fa-solid fa-trophy"></i>
+                            <span class="ml-2">Compétition</span>
+                        </div>
+                        <div class="font-bold">
+                            {{ r.league.competition }}
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary sm:w-1/2 sm:p-2">
+                        <div class="badge badge-secondary">
+                            <i class="fa-solid fa-meteor"></i>
+                            <span class="ml-2">Ligue</span>
+                        </div>
+                        <div class="font-bold">
+                            {{ r.league }}
+                        </div>
+                        <div>
+                            Bonus "Enjeu": {{ r.league.bonus_stake }}
+                        </div>
+                        <div>
+                            Bonus "Parfait": {{ r.league.bonus_perfect }}
+                        </div>
+                        <div>
+                            Score après-prolongation: {{ r.league.with_ext }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
