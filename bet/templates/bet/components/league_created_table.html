@@ -1,0 +1,138 @@
+<div x-data class="flex flex-col text-sm sm:text-base">
+    {#    Header        #}
+    <div class="p-2 flex font-bold border-b-2">
+        <div class="w-20">
+            <div class="flex flex-row gap-0.5 items-center">
+                <div class="badge badge-primary badge-sm">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <span>/</span>
+                <div class="badge badge-secondary badge-sm">
+                    <i class="fa-solid fa-meteor"></i>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-grow justify-center">
+            Ligue
+        </div>
+        <div class="w-16 sm:w-24"></div>
+    </div>
+    {% for l in leagues %}
+        <div x-disclosure class="p-1 border-b">
+            {#        League Summary#}
+            {% include 'bet/components/league_summary_table.html' with l=l created=True %}
+            {#        League details#}
+            <div x-disclosure:panel x-collapse class="flex flex-col bg-base-200">
+                {#            League Settings#}
+                <div class="p-2 flex flex-col">
+                    <form action="{% url 'place_bet' %}" method="post">
+                        {% csrf_token %}
+                        <div class="flex flex-col gap-1">
+                            <div class="flex flex-grow form-control flex-row">
+                                <label class="label w-28 sm:w-32 text-nowrap" for="league_name">Nom</label>
+                                <input type="text" minlength="3" maxlength="20"
+                                       placeholder="Nom de la Ligue"
+                                       class="flex flex-grow input input-bordered input-sm sm:input-md "
+                                       name="name" id="league_name" value="{{ l.name }}"/>
+                            </div>
+                            <div class="flex flex-grow form-control flex-row">
+                                <label class="label w-28 sm:w-32 text-nowrap" for="league_short_name">Nom court</label>
+                                <input type="text" minlength="3" maxlength="5"
+                                       placeholder="Nom de la Ligue"
+                                       class="flex flex-grow input input-bordered input-sm sm:input-md "
+                                       name="short_name" id="league_short_name" value="{{ l.short_name }}"/>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <h3 class="ml-1 font-semibold">
+                                    Paramètres
+                                </h3>
+                                <div class="flex flex-grow form-control flex-row">
+                                    <label class="label w-28 sm:w-32 text-nowrap" for="league_bonus_stake">Bonus "Enjeu"</label>
+                                    <select name="bonus_stake" id="league_bonus_stake" class="flex flex-grow select select-bordered select-sm sm:select-md">
+                                        <option value="1">Bonus activé</option>
+                                        <option value="0">Pas de bonus</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-grow form-control flex-row">
+                                    <label class="label w-28 sm:w-32 text-nowrap" for="league_bonus_perfect">Bonus "Parfait"</label>
+                                    <select name="bonus_perfect" id="league_bonus_perfect" class="flex flex-grow select select-bordered select-sm sm:select-md">
+                                        <option value="20" >20 points</option>
+                                        <option value="0">0 point</option>
+                                        <option value="10">10 points</option>
+                                        <option value="50">50 points</option>
+                                        <option value="100">100 points</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-grow form-control flex-row">
+                                    <label class="label w-28 sm:w-32 text-nowrap" for="league_with_ext">Score final</label>
+                                    <select name="with_ext" id="league_with_ext" class="flex flex-grow select select-bordered select-sm sm:select-md">
+                                        <option value="1" >Après Prolongation</option>
+                                        <option value="0">Avant Prologation</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-neutral sm:btn-md sm:mt-1" type="submit"><i class="fa-solid fa-pen"></i> <span class="uppercase">modifier</span></button>
+                        </div>
+                    </form>
+                </div>
+                {#League Players#}
+                <div class="flex flex-col gap-1 p-1 border border-base-content rounded mx-2 bg-base-300 text-base-content">
+                    <h3 class="badge badge-neutral">
+                        <i class="fa-solid fa-users"></i>
+                        <span class="ml-1">Joueurs</span>
+                    </h3>
+                    <div class="flex flex-col">
+
+                    {% for u in l.users.all %}
+                        <div class="flex p-1 gap-2">
+                            <div class="flex flex-grow items-center">
+                            {{ u.first_name }}
+                            </div>
+                            <div class="flex items-center">
+                            {{ u.email }}
+                            </div>
+                            <div class="w-18 sm:w4 flex items-center">
+                                <button class="btn btn-xs btn-neutral">
+                                    <i class="fa-solid fa-user-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+                {#                League info#}
+                <div class="flex flex-col p-1 bg-base-200">
+                    <div class="flex flex-col gap-1 mb-1 sm:flex-row sm:mb-2">
+                        <div class="flex flex-col gap-1 bg-primary-content rounded p-1 mx-1 border border-primary sm:w-1/2 sm:p-2">
+                            <div class="badge badge-primary">
+                                <i class="fa-solid fa-trophy"></i>
+                                <span class="ml-2">Compétition</span>
+                            </div>
+                            <div class="font-bold">
+                                {{ l.competition }}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary sm:w-1/2 sm:p-2">
+                            <div class="badge badge-secondary">
+                                <i class="fa-solid fa-meteor"></i>
+                                <span class="ml-2">Ligue</span>
+                            </div>
+                            <div class="font-bold">
+                                {{ l }}
+                            </div>
+                            <div>
+                                Bonus "Enjeu": {{ l.bonus_stake }}
+                            </div>
+                            <div>
+                                Bonus "Parfait": {{ l.bonus_perfect }}
+                            </div>
+                            <div>
+                                Score après-prolongation: {{ l.with_ext }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

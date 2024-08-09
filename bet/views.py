@@ -8,7 +8,7 @@ import polars as pl
 
 from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm
-from bet.models import Game, Bet, CustomUser, League, Competition
+from bet.models import Game, Bet, CustomUser, League, Competition, Team
 from django.utils import timezone
 from bet.utils import get_table, get_results, Result, Ranking
 
@@ -139,8 +139,26 @@ def results(request):
 
 @login_required
 def leagues(request):
-    all_leagues = League.objects.all()
-    return render(request, 'bet/leagues.html', {'leagues': all_leagues})
+    leagues_played = League.objects.filter(users = request.user)
+    leagues_created = League.objects.filter(owner=request.user)
+    return render(request, 'bet/leagues.html', {'leagues': leagues_played,
+                                                'leagues_created': leagues_created,
+                                                'leagues_played': leagues_played
+                                                })
+
+
+@login_required
+def competitions(request):
+    competitions_created = Competition.objects.filter(owner=request.user)
+    return render(request, 'bet/competitions.html', {'competitions_created': competitions_created})
+
+
+@login_required
+def teams(request):
+    teams_created = Team.objects.filter(owner=request.user)
+    return render(request, 'bet/teams.html', {'teams_created': teams_created})
+
+
 
 def join_league(request, league_id):
     league = get_object_or_404(League, pk=league_id)
