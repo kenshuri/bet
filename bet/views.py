@@ -8,7 +8,7 @@ from django.contrib import messages
 import polars as pl
 
 from accounts.forms import CustomUserCreationForm
-from bet.forms import SignUpForm, BetForm
+from bet.forms import SignUpForm, BetForm, LeagueForm
 from bet.models import Game, Bet, CustomUser, League, Competition, Team
 from django.utils import timezone
 from bet.utils import get_table, get_results, Result, Ranking
@@ -149,6 +149,21 @@ def leagues(request):
 
 
 @login_required
+def create_league(request):
+    if request.method == 'POST':
+        form = LeagueForm(request.POST)
+        if form.is_valid():
+            league = form.save(commit=False)
+            league.owner = request.user
+            league.save()
+            return redirect('leagues')
+    else:
+        form = LeagueForm()
+        c_choices = Competition.objects.filter(id=1)
+    return render(request, 'bet/create_league.html',
+                  {'form': form, 'ln': request.GET['league_name'], 'c_choices': c_choices})
+
+@login_required
 def competitions(request):
     competitions_created = Competition.objects.filter(owner=request.user)
     return render(request, 'bet/competitions.html', {'competitions_created': competitions_created})
@@ -161,10 +176,14 @@ def teams(request):
 
 
 
-def join_league(request, league_id):
-    league = get_object_or_404(League, pk=league_id)
-    league.users.add(request.user)
-    return redirect('index')
+def join_league(request):
+    if request.method == 'POST':
+        league_code = request.POST['league_code']
+        league_qs = League.objects.filter(code=league_code)
+        if len(league_qs) == 1:
+            league = league_qs.get()
+            league.users.add(request.user)
+    return redirect('leagues')
 
 def quit_league(request, league_id):
     league = get_object_or_404(League, pk=league_id)

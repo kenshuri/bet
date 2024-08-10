@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from accounts.models import CustomUser
 from django.core.validators import MinValueValidator
@@ -95,6 +97,8 @@ class League(models.Model):
     bonus_stake = models.IntegerField(choices=StakeChoice.choices)
     bonus_perfect = models.IntegerField(choices=PerfectChoice.choices)
     with_ext = models.BooleanField()
+    code = models.CharField(max_length=36, default=uuid.uuid4)
+
 
 
     def __str__(self):

@@ -38,3 +38,8 @@ class BetForm(forms.ModelForm):
         model = Bet
         fields = ['score_team1', 'score_team2', 'game', 'league']
 
+
+class LeagueForm(forms.ModelForm):
+    class Meta:
+        model = League
+        fields = ['name', 'short_name', 'competition', 'bonus_stake', 'bonus_perfect', 'with_ext']

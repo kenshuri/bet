@@ -9,7 +9,7 @@
         {#    Join a league#}
         <div class="flex flex-col gap-1">
             <h2 class="text-lg font-semibold mt-2">Rejoindre une ligue</h2>
-            <form action="{% url 'place_bet' %}" method="post">
+            <form action="{% url 'join_league' %}" method="post">
                 {% csrf_token %}
                 <div class="flex flex-grow gap-1">
                     <div class="flex flex-grow form-control w-2/3">
@@ -36,7 +36,7 @@
         {#        Create a league#}
         <div class="flex flex-col gap-1 mt-2">
             <h2 class="text-lg font-semibold">Créer une ligue</h2>
-            <form action="{% url 'place_bet' %}" method="post">
+            <form action="{% url 'create_league' %}" method="get">
                 {% csrf_token %}
                 <div class="flex flex-grow gap-1">
                     <div class="flex flex-grow form-control w-2/3">
@@ -45,7 +45,7 @@
                                class="flex flex-grow input input-bordered input-sm sm:input-md"
                                name="league_name" id="league_name"/>
                     </div>
-                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" >
                         <i class="fa-solid fa-meteor"></i>
                         <span class="hidden sm:flex">Créer</span>
                     </button>

@@ -1,0 +1,64 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP - Créer une ligue
+{% endblock title %}
+
+{% block main %}
+    <div class="flex flex-col p-2 gap-2">
+        <h2 class="text-lg font-semibold">Créer une ligue</h2>
+        <form action="{% url 'create_league' %}" method="post"
+              class="flex flex-col gap-1">
+            {% csrf_token %}
+            <div class="form-control">
+                <label class="label" for="id_name">
+                    Nom de la ligue
+                </label>
+                <input type="text" name="name" value="{{ ln }}" minlength="3" maxlength="50" required id="id_name"
+                       class="input input-bordered input-sm sm:input-md">
+            </div>
+            <div class="form-control">
+                <label class="label" for="id_short_name">Nom court</label>
+                <input type="text" name="short_name" minlength="2" maxlength="5" id="id_short_name"
+                       class="input input-bordered input-sm sm:input-md">
+            </div>
+            <div class="form-control">
+                <label class="label" for="id_competition">Compétition</label>
+                <select name="competition" id="id_competition"
+                        class="select select-bordered input-sm sm:input-md">
+                    {% for c in c_choices %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-control">
+                <label class="label" for="id_bonus_stake">Bonus "Enjeu"</label>
+                <select name="bonus_stake" required id="id_bonus_stake"
+                        class="select select-bordered input-sm sm:input-md">
+                    <option value="1" selected>Bonus Activé</option>
+                    <option value="0">Pas de bonus</option>
+                </select>
+            </div>
+            <div class="form-control">
+                <label class="label" for="id_bonus_perfect">Bonus "Parfait"</label>
+                <select name="bonus_perfect" required id="id_bonus_perfect"
+                        class="select select-bordered input-sm sm:input-md">
+                    <option value="20" selected>20 points</option>
+                    <option value="0">Pas de bonus</option>
+                    <option value="10">10 points</option>
+                    <option value="50">50 points</option>
+                    <option value="100">100 points</option>
+                </select>
+            </div>
+            <div class="form-control flex flex-row gap-2 items-center">
+                <label class="label" for="id_with_ext">Score final après prolongation</label>
+                <input type="checkbox" name="with_ext" id="id_with_ext"
+                       class="toggle toggle-primary" checked="checked" />
+            </div>
+            <button class="btn btn-sm btn-success sm:btn-md mt-2 btn-block" type="submit">
+                <i class="fa-solid fa-meteor"></i>
+                <span>Créer Ligue</span>
+            </button>
+        </form>
+    </div>
+{% endblock %}

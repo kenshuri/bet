@@ -8,10 +8,23 @@
                             {{ l.sn }}
                         </span>
         </div>
-        <div class="flex flex-grow items-center">{{ l.name }}</div>
+        <div class="flex flex-grow items-center">
+            <div class="flex flex-grow">{{ l.name }}</div>
+            {% if created %}
+                <div @click.stop @click="navigator.clipboard.writeText('{{ l.code }}'), showMsg = true, setTimeout(() => showMsg = false, 1500)"
+                     class="w-32 overflow-hidden text-nowrap p-1 border rounded">
+                 <i class="fa-solid fa-share"></i><span class="ml-1">{{ l.code }}</span>
+                </div>
+                <div x-show="showMsg" class="toast toast-bottom sm:toast-top toast-end">
+                  <div class="alert alert-info">
+                    <span>Code de la ligue copié</span>
+                  </div>
+                </div>
+            {% endif %}
+        </div>
         <div class="p-1 flex items-center gap-1 sm:flex-row sm:gap-2 ">
             {% if not created %}
-            <button @click.stop class="btn btn-square btn-xs btn-error sm:btn-sm" type="submit"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <button @click.stop class="btn btn-square btn-disabled  btn-xs btn-error sm:btn-sm" type="submit"><i class="fa-solid fa-right-from-bracket"></i></button>
             {% endif %}
             <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true" >
                             <i class="fa-solid fa-chevron-up"></i>
