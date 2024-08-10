@@ -8,7 +8,7 @@
     <div class="flex flex-col p-2 gap-2">
         {#    Join a league#}
         <div class="flex flex-col gap-1">
-            <h2 class="text-lg font-semibold">Rejoindre une ligue</h2>
+            <h2 class="text-lg font-semibold mt-2">Rejoindre une ligue</h2>
             <form action="{% url 'place_bet' %}" method="post">
                 {% csrf_token %}
                 <div class="flex flex-grow gap-1">
@@ -18,7 +18,7 @@
                                class="flex flex-grow input input-bordered input-sm sm:input-md "
                                name="league_code" id="league_code" />
                     </div>
-                    <button class="flex gap-1 btn btn-sm btn-neutral sm:btn-md" type="submit">
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
                         <i class="fa-solid fa-user-plus"></i>
                         <span class="hidden sm:flex">Rejoindre</span>
                     </button>
@@ -45,7 +45,7 @@
                                class="flex flex-grow input input-bordered input-sm sm:input-md"
                                name="league_name" id="league_name"/>
                     </div>
-                    <button class="flex gap-1 btn btn-sm btn-neutral sm:btn-md" type="submit">
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
                         <i class="fa-solid fa-meteor"></i>
                         <span class="hidden sm:flex">Créer</span>
                     </button>

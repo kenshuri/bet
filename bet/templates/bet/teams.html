@@ -5,4 +5,93 @@
 {% endblock title %}
 
 {% block main %}
+    <div class="flex flex-col p-2 gap-2">
+        {#        Create a team#}
+        <div class="flex flex-col gap-1 mt-2">
+            <h2 class="text-lg font-semibold">Créer une équipe</h2>
+            <form action="{% url 'place_bet' %}" method="post">
+                {% csrf_token %}
+                <div class="flex flex-grow gap-1">
+                    <div class="flex flex-grow form-control w-2/3">
+                        <label class="label hidden" for="team_name"></label>
+                        <input type="text" placeholder="Nom de l'équipe" required
+                               class="flex flex-grow input input-bordered input-sm sm:input-md"
+                               name="name" id="team_name"/>
+                    </div>
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
+                        <i class="fa-solid fa-people-group"></i>
+                        <span class="hidden sm:flex">Créer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {#    My teams competitions#}
+        <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold">Mes équipes créées </h2>
+            <div class="flex flex-col">
+                <div x-data class="flex flex-col text-sm sm:text-base">
+                    {#    Header        #}
+                    <div class="p-2 flex font-bold border-b-2">
+                        <div class="w-20">
+                            <div class="flex flex-row gap-0.5 items-center">
+                                <div class="badge badge-neutral badge-sm">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-grow justify-center capitalize">
+                            équipe
+                        </div>
+                        <div class="w-16 sm:w-24"></div>
+                    </div>
+                    {% for t in teams_created %}
+                        <div x-disclosure class="p-1 border-b">
+                            {#        Team Summary#}
+                            <div x-disclosure:button class="" :class="$disclosure.isOpen && 'bg-base-200'">
+                                <div class="flex">
+                                    <div class="w-20 p-1 flex flex-col justify-center gap-0.5">
+                                        <span class="badge badge-neutral">
+                                            {% if t.activity_type == 1001 %}
+                                                <i class="fa-solid fa-futbol"></i>
+                                            {% else %}
+                                                <i class="fa-solid fa-flag"></i>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-grow items-center">{{ t.name }}</div>
+                                    <div class="p-1 flex items-center gap-1 sm:flex-row sm:gap-2 ">
+                                        <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true" >
+                                            <i class="fa-solid fa-chevron-up"></i>
+                                        </span>
+                                        <span x-show="! $disclosure.isOpen" aria-hidden="true" >
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {#            Team details#}
+                            <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+                                <div class="flex flex-col flex-grow gap-1 bg-primary-content rounded p-1 mx-1 border border-primary">
+                                    <div class="badge badge-primary">
+                                        <i class="fa-solid fa-trophy"></i>
+                                        <span class="ml-2">Compétitions liées</span>
+                                    </div>
+                                    {% for c in c.lg_competition.all %}
+                                        <div class="flex gap-1 items-center">
+                                            <span class="badge badge-secondary">{{ l.sn }}</span>
+                                            <span class="flex flex-grow">{{ l.name }}</span>
+                                            <span class="badge badge-neutral"><i class="fa-solid fa-users"></i>{{ l.users.all|length }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

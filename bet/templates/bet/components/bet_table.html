@@ -21,7 +21,11 @@
         <div x-disclosure class="p-1 border-b">
             {#            Bet Summary#}
             <div>
-                <form action="{% url 'place_bet' %}" method="post">
+                <form hx-post="{% url 'place_bet' %}"
+                      hx-target="#bets_toast"
+                      hx-swap="beforeend"
+                      hx-trigger="input delay:500ms, submit"
+                      >
                     <div x-disclosure:button :class="$disclosure.isOpen && 'bg-base-200'">
                         {% csrf_token %}
                         <div class="flex">

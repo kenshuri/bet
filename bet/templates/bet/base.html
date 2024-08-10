@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="{% static 'mgp-Kittl.svg' %}"/>
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
-    <script src="https://unpkg.com/htmx.org@1.8.0" integrity="sha384-cZuAZ+ZbwkNRnrKi05G/fjBX+azI9DNOkNYysZ0I/X5ZFgsmMiBXgDZof30F5ofc" crossorigin="anonymous" defer></script>
+    <script src="https://unpkg.com/htmx.org@2.0.1/dist/htmx.js" integrity="sha384-gpIh5aLQ0qmX8kZdyhsd6jA24uKLkqIr1WAGtantR4KsS97l/NRBvh8/8OYGThAf" crossorigin="anonymous"></script>
     <script defer src="https://unpkg.com/@alpinejs/ui@3.14.1-beta.0/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.1/dist/cdn.min.js"></script>
@@ -100,19 +100,19 @@
                         </ul>
                     </div>
                     {% if request.path in '/ /bets /results' %}
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-ranking-star"></i> Classement</a></li>
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i> Paris</a></li>
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Résultats</a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-ranking-star"></i> Classement</a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i> Paris</a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Résultats</a></li>
                     {% else %}
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'leagues' %}"><i class="fa-solid fa-meteor"></i>
-                        <span class="sm:hidden"> Ligues</span>
-                        <span class="hidden sm:inline"> Mes Ligues</span></a></li>
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'competitions' %}"><i class="fa-solid fa-trophy"></i>
-                        <span class="sm:hidden"> Compét'</span>
-                        <span class="hidden sm:inline"> Mes Compétitions</span></a></li>
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'teams' %}"><i class="fa-solid fa-people-group"></i>
-                        <span class="sm:hidden"> équipes</span>
-                        <span class="hidden sm:inline"> Mes équipes</span></a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'leagues' %}"><i class="fa-solid fa-meteor"></i>
+                            <span class="sm:hidden"> Ligues</span>
+                            <span class="hidden sm:inline"> Mes Ligues</span></a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'competitions' %}"><i class="fa-solid fa-trophy"></i>
+                            <span class="sm:hidden"> Compét'</span>
+                            <span class="hidden sm:inline"> Mes Compétitions</span></a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'teams' %}"><i class="fa-solid fa-people-group"></i>
+                            <span class="sm:hidden"> équipes</span>
+                            <span class="hidden sm:inline"> Mes équipes</span></a></li>
 
                     {% endif %}
                 </ul>

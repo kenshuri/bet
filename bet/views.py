@@ -3,6 +3,7 @@ import plistlib
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+from django.contrib import messages
 
 import polars as pl
 
@@ -90,7 +91,7 @@ def place_bet(request):
                         'score_team2': form.cleaned_data['score_team2']
                     }
                 )
-                return redirect('bets')
+                return render(request, 'bet/partials/bet_placed.html', context={'bet': bet, 'created': created})
         else:
             for field_name, errors in form.errors.items():
                 for error in errors:

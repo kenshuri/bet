@@ -6,6 +6,26 @@
 
 {% block main %}
     <div class="flex flex-col p-2 gap-2">
+        {#        Create a competition#}
+        <div class="flex flex-col gap-1 mt-2">
+            <h2 class="text-lg font-semibold">Créer une compétition</h2>
+            <form action="{% url 'place_bet' %}" method="post">
+                {% csrf_token %}
+                <div class="flex flex-grow gap-1">
+                    <div class="flex flex-grow form-control w-2/3">
+                        <label class="label hidden" for="competition_name"></label>
+                        <input type="text" placeholder="Nom de la Compétition" required
+                               class="flex flex-grow input input-bordered input-sm sm:input-md"
+                               name="name" id="competition_name"/>
+                    </div>
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
+                        <i class="fa-solid fa-trophy"></i>
+                        <span class="hidden sm:flex">Créer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
         {#    My created competitions#}
         <div class="flex flex-col gap-1">
             <h2 class="text-lg font-semibold">Mes compétitions créées </h2>
