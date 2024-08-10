@@ -8,11 +8,6 @@
     <div class="flex flex-col mt-2 gap-2" id="bet-block">
     {% include 'bet/components/bet_table.html' with bets=upcoming_bets %}
     </div>
-    <div id="bets_toast"
-         class="toast toast-bottom toast-end sm:toast-top text-xs sm:text-sm">
-
+    <div id="bets_toast" class="toast toast-bottom toast-end sm:toast-top text-xs sm:text-sm">
     </div>
-    <section id="messages">
-    {% include 'bet/partials/toast.html' %}
-    </section>
 {% endblock main %}
