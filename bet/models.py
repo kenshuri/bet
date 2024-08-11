@@ -14,6 +14,7 @@ class OwnerType(models.IntegerChoices):
 class ActivityType(models.IntegerChoices):
     MIXED = 0, _('Mixed')  #  For a competition -> means that any type of team can participate, for a team -> means it's a country team
     FOOTBALL = 1001, _('Football')
+    TENNIS = 1002, _('Tennis')
 
 
 class GameType(models.IntegerChoices):

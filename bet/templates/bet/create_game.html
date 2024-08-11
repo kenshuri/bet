@@ -1,0 +1,113 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP - Créer un match
+{% endblock title %}
+
+{% block main %}
+    <div x-data class="flex flex-col p-2 gap-2">
+        <h2 class="text-lg font-semibold">Créer un match</h2>
+
+        <div x-disclosure class="bg-green-200 border-2 border-green-500 rounded">
+            <div x-disclosure:button :class="$disclosure.isOpen && 'bg-base-200'"
+                 class="flex justify-between p-1 rounded-t">
+                <h3 class="font-semibold"> <i class="fa-solid fa-plus-circle"></i> Ajouter des équipes</h3>
+                <div class="p-1 flex items-center gap-1 sm:flex-row sm:gap-2 ">
+                    <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true" >
+                                    <i class="fa-solid fa-chevron-up"></i>
+                                </span>
+                    <span x-show="! $disclosure.isOpen" aria-hidden="true" >
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </span>
+                </div>
+            </div>
+            <div x-disclosure:panel x-collapse class="bg-base-200 p-1 rounded-b">
+                <form hx-post="{% url 'create_team' %}"
+                      hx-target="#teams"
+                      hx-swap="innerHTML"
+                      class="flex flex-col gap-1">
+                    {% csrf_token %}
+                    <div class="form-control">
+                        <label class="label" for="id_name">
+                            Nom de l'équipe
+                        </label>
+                        <input type="text" name="name" minlength="2" maxlength="50" required id="id_name"
+                               class="input input-bordered input-sm sm:input-md">
+                        <input type="hidden" name="team_competition_id" value="{{ c.id }}" id="id_team_competition_id">
+                    </div>
+                    <div class="form-control">
+                        <label class="label" for="id_activity_type">Activité de l'équipe</label>
+                        <select name="activity_type" required id="id_activity_type"
+                                class="select select-bordered input-sm sm:input-md">
+                            {% for a in a_choices %}
+                                {% if forloop.first %}
+                                {% else %}
+                                    <option value="{{ a.value }}">{{ a.label }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-sm btn-success sm:btn-md mt-2 btn-block" type="submit">
+                        <i class="fa-solid fa-people-group"></i>
+                        <span class="capitalize">Créer équipe</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <form action="{% url 'create_game' %}" method="post"
+              class="flex flex-col gap-1">
+            {% csrf_token %}
+            <div>
+                <div class="badge badge-primary"><i class="fa-solid fa-trophy"></i> <span class="ml-1">{{ c.name }}</span></div>
+                <input type="hidden" value="{{ c.id }}" name="competition" id="id_competition">
+            </div>
+            {#            Teams to be updated if new team added#}
+            <div id="teams">
+                <div class="form-control">
+                    <label class="label" for="id_team_1">
+                        Equipe 1
+                    </label>
+                    <select name="team_1" required id="id_team_1"
+                            class="select select-bordered select-sm sm:select-md">
+                        {% for t in t_choices %}
+                            <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label" for="id_team_2">
+                        Equipe 2
+                    </label>
+                    <select name="team_2" required id="id_team_2"
+                            class="select select-bordered select-sm sm:select-md">
+                        {% for t in t_choices %}
+                            <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-control">
+                <label class="label" for="id_game_type">
+                    Type de match
+                </label>
+                <select name="game_type" required id="id_game_type"
+                        class="select select-bordered select-sm sm:select-md">
+                    {% for gt in gt_choices %}
+                        <option value="{{ gt.value }}">{{ gt.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-control">
+                <label class="label" for="id_start_datetime">
+                    Début du match
+                </label>
+                <input type="datetime-local" required id="id_start_datetime" name="start_datetime"
+                       class="input input-bordered input-sm sm:input-md">
+            </div>
+            <button class="btn btn-sm btn-success sm:btn-md mt-2 btn-block" type="submit">
+                <i class="fa-solid fa-bolt-lightning"></i>
+                <span>Créer Match</span>
+            </button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+<div class="form-control">
+    <label class="label" for="id_team_1">
+        Equipe 1
+    </label>
+    <select name="team_1" required id="id_team_1"
+            class="select select-bordered input-sm sm:input-md">
+        {% for t in t_choices %}
+            <option value="{{ t.id }}">{{ t.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div class="form-control">
+    <label class="label" for="id_team_2">
+        Equipe 2
+    </label>
+    <select name="team_2" required id="id_team_2"
+            class="select select-bordered input-sm sm:input-md">
+        {% for t in t_choices %}
+            <option value="{{ t.id }}">{{ t.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div id="bets_toast" class="toast toast-bottom toast-end sm:toast-top text-xs sm:text-sm">
+    <div x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
+         class="alert  {% if team_created_flag %} alert-success {% else %} alert-error {% endif %} flex text-wrap justify-start">
+        <span class="capitalize"><i class="fa-solid fa-people-group"></i> {% if team_created_flag %} équipe créée {% else %} erreur lors de la création de l'équipe {% endif %} </span>
+    </div>
+</div>

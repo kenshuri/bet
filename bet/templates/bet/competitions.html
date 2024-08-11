@@ -9,14 +9,14 @@
         {#        Create a competition#}
         <div class="flex flex-col gap-1 mt-2">
             <h2 class="text-lg font-semibold">Créer une compétition</h2>
-            <form action="{% url 'place_bet' %}" method="post">
+            <form action="{% url 'create_competition' %}" method="get">
                 {% csrf_token %}
                 <div class="flex flex-grow gap-1">
                     <div class="flex flex-grow form-control w-2/3">
                         <label class="label hidden" for="competition_name"></label>
                         <input type="text" placeholder="Nom de la Compétition" required
                                class="flex flex-grow input input-bordered input-sm sm:input-md"
-                               name="name" id="competition_name"/>
+                               name="competition_name" id="competition_name"/>
                     </div>
                     <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
                         <i class="fa-solid fa-trophy"></i>
@@ -88,6 +88,49 @@
                 </div>
             </div>
         </div>
+
+        {#        Create a game#}
+        <div class="flex flex-col gap-1 mt-2">
+            <h2 class="text-lg font-semibold">Créer un match</h2>
+            <form action="{% url 'create_game' %}" method="get">
+                {% csrf_token %}
+                <div class="flex flex-grow gap-1">
+                    <div class="form-control flex flex-grow">
+                        <label class="label hidden" for="id_competition_id">Compétition</label>
+                        <select name="competition_id" required id="id_competition_id"
+                                class="flex flex-grow select select-bordered select-sm sm:select-md">
+                            {% for c in competitions_created %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
+                        <i class="fa-solid fa-bolt-lightning"></i>
+                        <span class="hidden sm:flex">Créer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {#    My games#}
+    <div class="flex flex-col gap-1">
+        <h2 class="text-lg font-semibold">Gérer mes matchs </h2>
+        {% for g in games %}
+            <div>
+            {{ g.team_1 }}
+            </div>
+        {% endfor %}
+    </div>
+
+
+    <div class="toast toast-bottom toast-end sm:toast-top text-xs sm:text-sm">
+        {% if game_created_flag %}
+            <div x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
+                 class="alert {% if game_created_flag == 2 %} alert-success {% elif game_created_flag == 1 %} alert-error {% endif %} flex text-wrap justify-start">
+                <span><i class="fa-solid fa-bolt-lightning"></i> {% if game_created_flag == 2 %} Match créé {% elif game_created_flag == 1 %} Erreur lors de la création du match {% endif %} </span>
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}

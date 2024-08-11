@@ -3,13 +3,13 @@ import plistlib
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from django.contrib import messages
+from django.db.models import Q
 
 import polars as pl
 
 from accounts.forms import CustomUserCreationForm
-from bet.forms import SignUpForm, BetForm, LeagueForm
-from bet.models import Game, Bet, CustomUser, League, Competition, Team
+from bet.forms import SignUpForm, BetForm, LeagueForm, CompetitionForm, GameForm, TeamForm
+from bet.models import Game, Bet, CustomUser, League, Competition, Team, ActivityType, GameType
 from django.utils import timezone
 from bet.utils import get_table, get_results, Result, Ranking
 
@@ -67,9 +67,9 @@ def bets(request):
                                                              x.instance.league.id))
     context = {
         # 'upcoming_games': upcoming_games_list,
-               'existing_bets': existing_bets,
-               'upcoming_bets': upcoming_bets,
-               'user_leagues': user_leagues}
+        'existing_bets': existing_bets,
+        'upcoming_bets': upcoming_bets,
+        'user_leagues': user_leagues}
     return render(request, 'bet/bets.html', context=context)
 
 @login_required
@@ -159,20 +159,97 @@ def create_league(request):
             return redirect('leagues')
     else:
         form = LeagueForm()
-        c_choices = Competition.objects.filter(id=1)
+        c_choices = Competition.objects.exclude(id=0)
     return render(request, 'bet/create_league.html',
                   {'form': form, 'ln': request.GET['league_name'], 'c_choices': c_choices})
+
+
+@login_required
+def create_competition(request):
+    if request.method == 'POST':
+        form = CompetitionForm(request.POST)
+        if form.is_valid():
+            competition = form.save(commit=False)
+            competition.owner = request.user
+            competition.save()
+        return redirect('competitions')
+    else:
+        form = CompetitionForm()
+        a_choices = ActivityType
+        return render(request, 'bet/create_competition.html',
+                      {'form': form, 'ln': request.GET.get('competition_name', ''),
+                       'a_choices': a_choices})
+
+
+@login_required
+def create_game(request):
+    if request.method == 'POST':
+        form = GameForm(request.POST)
+        game_created_flag = 1
+        if form.is_valid():
+            game = form.save(commit=False)
+            if game.competition.owner == request.user:
+                game.save()
+                game_created_flag = 2
+        competitions_created = Competition.objects.filter(owner=request.user)
+        games = Game.objects.filter(competition__owner=request.user)
+        return render(request, 'bet/competitions.html',
+                      {'competitions_created': competitions_created, 'games': games,
+                       'game_created_flag': game_created_flag})
+    else:
+        game_form = GameForm()
+        c = Competition.objects.get(id=request.GET.get('competition_id'))
+        t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(Q(owner=request.user) | Q(owner__is_staff=True))
+        if c.activity_type == ActivityType.MIXED:
+            a_choices = ActivityType
+        else:
+            a_choices = [{'label': 'Needed to deal with MIXED Activity', 'value':0},
+                {'label': [ca[1] for ca in ActivityType.choices if ca[0] == c.activity_type][0],
+                 'value': c.activity_type}]
+        gt_choices = GameType
+        return render(request, 'bet/create_game.html',
+                      {'game_form': game_form, 'c': c, 't_choices': t_choices, 'a_choices': a_choices, 'gt_choices': gt_choices})
+
+
 
 @login_required
 def competitions(request):
     competitions_created = Competition.objects.filter(owner=request.user)
-    return render(request, 'bet/competitions.html', {'competitions_created': competitions_created})
+    games = Game.objects.filter(competition__owner=request.user)
+    return render(request, 'bet/competitions.html', {'competitions_created': competitions_created, 'games': games})
 
 
 @login_required
 def teams(request):
     teams_created = Team.objects.filter(owner=request.user)
     return render(request, 'bet/teams.html', {'teams_created': teams_created})
+
+
+def create_team(request):
+    if request.method == 'POST':
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.owner = request.user
+            form.save()
+            team_created_flag = True
+        else:
+            team_created_flag = False
+        c_id = request.POST.get('team_competition_id')
+        game_form = GameForm()
+        c = Competition.objects.get(id=c_id)
+        t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(
+            Q(owner=request.user) | Q(owner__is_staff=True))
+        if c.activity_type == ActivityType.MIXED:
+            a_choices = ActivityType
+        else:
+            a_choices = [{'label': 'Needed to deal with MIXED Activity', 'value': 0},
+                         {'label': [ca[1] for ca in ActivityType.choices if ca[0] == c.activity_type][0],
+                          'value': c.activity_type}]
+        gt_choices = GameType
+        return render(request, 'bet/partials/create_game_teams.html',
+                      {'game_form': game_form, 'c': c, 't_choices': t_choices, 'a_choices': a_choices, 'gt_choices': gt_choices,
+                       'team_created_flag': team_created_flag})
 
 
 

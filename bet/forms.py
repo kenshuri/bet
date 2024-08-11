@@ -4,7 +4,8 @@ from django.forms import ModelForm
 from django_email_blacklist import DisposableEmailChecker
 
 from accounts.models import CustomUser
-from bet.models import Bet, Game, League
+from bet.models import Bet, Game, League, Competition, Team
+
 
 class SignUpForm(UserCreationForm):
     class Meta:
@@ -43,3 +44,22 @@ class LeagueForm(forms.ModelForm):
     class Meta:
         model = League
         fields = ['name', 'short_name', 'competition', 'bonus_stake', 'bonus_perfect', 'with_ext']
+
+class CompetitionForm(forms.ModelForm):
+    class Meta:
+        model = Competition
+        fields = ['name', 'short_name', 'activity_type']
+
+
+class GameForm(forms.ModelForm):
+    class Meta:
+        model = Game
+        fields = ['competition', 'team_1', 'team_2', 'score_team1', 'score_team2',
+                  'score_team1_after_ext', 'score_team2_after_ext', 'game_type',
+                  'start_datetime']
+
+
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields  = ['name', 'activity_type']
