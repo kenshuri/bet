@@ -203,7 +203,10 @@ def create_game(request):
     else:
         game_form = GameForm()
         c = Competition.objects.get(id=request.GET.get('competition_id'))
-        t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(Q(owner=request.user) | Q(owner__is_staff=True))
+        if c.activity_type == 0:
+            t_choices = Team.objects.filter(Q(owner=request.user) | Q(owner__is_staff=True))
+        else:
+            t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(Q(owner=request.user) | Q(owner__is_staff=True))
         if c.activity_type == ActivityType.MIXED:
             a_choices = ActivityType
         else:
