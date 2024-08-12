@@ -192,7 +192,11 @@ def create_game(request):
                 game.save()
                 game_created_flag = 2
         competitions_created = Competition.objects.filter(owner=request.user)
-        games = Game.objects.filter(competition__owner=request.user)
+        games_owner = Game.objects.filter(competition__owner=request.user)
+        games = list()
+        for g in games_owner:
+            game_form = GameForm(instance=g)
+            games.append(game_form)
         return render(request, 'bet/competitions.html',
                       {'competitions_created': competitions_created, 'games': games,
                        'game_created_flag': game_created_flag})
@@ -211,11 +215,30 @@ def create_game(request):
                       {'game_form': game_form, 'c': c, 't_choices': t_choices, 'a_choices': a_choices, 'gt_choices': gt_choices})
 
 
+@login_required
+def update_game(request):
+    if request.method == 'POST':
+        game = Game.objects.get(id=request.POST.get('game_id'))
+        form = GameForm(request.POST, instance=game)
+        game_updated_flag = False
+        if form.is_valid():
+            form.save()
+            game_updated_flag = True
+        return render(request, 'bet/partials/game_updated.html', context={'game_updated_flag': game_updated_flag, 'game': game})
+
+    return redirect('competitions')
+
+
 
 @login_required
 def competitions(request):
     competitions_created = Competition.objects.filter(owner=request.user)
-    games = Game.objects.filter(competition__owner=request.user)
+    games_owner = Game.objects.filter(competition__owner=request.user).order_by('start_datetime', 'competition_id')
+    games = list()
+    for g in games_owner:
+        game_form = GameForm(instance=g)
+        games.append(game_form)
+
     return render(request, 'bet/competitions.html', {'competitions_created': competitions_created, 'games': games})
 
 

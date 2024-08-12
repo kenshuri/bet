@@ -28,6 +28,7 @@ urlpatterns = [
     path('competitions', bet.views.competitions, name='competitions'),
     path('create_competition', bet.views.create_competition, name='create_competition'),
     path('create_game', bet.views.create_game, name='create_game'),
+    path('update_game', bet.views.update_game, name='update_game'),
     path('teams', bet.views.teams, name='teams'),
     path('create_team', bet.views.create_team, name='create_team'),
     path('results', bet.views.results, name='results'),

@@ -1,0 +1,103 @@
+<div x-data class="flex flex-col text-sm sm:text-base">
+    {#    Header        #}
+    <div class="p-2 flex font-bold border-b-2">
+        <div class="w-24">
+            <div class="flex flex-row gap-0.5 items-center">
+                <div class="badge badge-primary badge-sm">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-grow justify-center">
+            Match
+        </div>
+        <div class="w-16 sm:w-24"></div>
+    </div>
+    {% for game_form in games %}
+        <form hx-post="{% url 'update_game' %}"
+                      hx-target="#game_updated_toasts"
+                      hx-swap="beforeend"
+                      hx-trigger="input delay:500ms, submit"
+        >
+            <div x-disclosure class="p-1 border-b">
+                {#            Game Summary#}
+                <div>
+                    <div x-disclosure:button :class="$disclosure.isOpen && 'bg-base-200'">
+                        {% csrf_token %}
+                        <div class="flex">
+                            <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
+                                <span class="badge badge-primary">
+                                    {{ game_form.instance.competition.sn}}
+                                </span>
+                            </div>
+                            <div class="flex flex-grow p-1 pt-0 flex-col gap-0.5">
+                                <div class="flex justify-center">
+                                    <div class="badge badge-sm flex gap-2 m-1 sm:badge-md">
+                                        <i class="fa-solid fa-clock"></i>
+                                        {{ game_form.instance.start_datetime|date:'d/m/y'}} {{ game_form.instance.start_datetime|date:'H:i'}}
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-2">
+                                    <div class="flex flex-grow gap-1">
+                                        <div class="flex flex-grow items-center sm:justify-end">
+                                            {{ game_form.instance.team_1 }}
+                                        </div>
+                                        <div @click.stop class="form-control">
+                                            <label class="label hidden" for="id_score_team1"></label>
+                                            <input @keydown.enter.stop required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
+                                                   name="score_team1" id="id_score_team1" value="{{ game_form.instance.score_team1 }}"/>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-grow gap-1 sm:flex-row-reverse">
+                                        <div class="flex flex-grow items-center">
+                                            {{ game_form.instance.team_2 }}
+                                        </div>
+                                        <div @click.stop class="form-control">
+                                            <label class="label hidden" for="id_score_team2"></label>
+                                            <input @keydown.enter.stop required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
+                                                   name="score_team2" id="id_score_team2" value="{{ game_form.instance.score_team2 }}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-1 flex items-center gap-1 sm:flex-row sm:gap-2 ">
+                                <button @click.stop class="btn btn-square btn-xs btn-neutral sm:btn-sm" type="submit"><i class="fa-solid fa-bolt-lightning"></i></button>
+                                <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true" >
+                                    <i class="fa-solid fa-chevron-up"></i>
+                                </span>
+                                <span x-show="! $disclosure.isOpen" aria-hidden="true" >
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {#            Bet Details#}
+                <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+                    <div class="flex flex-col gap-1 mb-1 sm:flex-row sm:mb-2">
+                        <div class="flex flex-col gap-1 bg-primary-content rounded p-1 mx-1 border border-primary sm:w-1/2 sm:p-2">
+                            <div class="badge badge-primary">
+                                <i class="fa-solid fa-trophy"></i>
+                                <span class="ml-2">Compétition</span>
+                            </div>
+                            <div class="font-bold">
+                                {{ game_form.instance.competition }}
+                            </div>
+                            <div>
+                                Type de match: {{ game_form.instance.game_type }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {{ game_form.team_1.as_hidden }}
+                {{ game_form.team_2.as_hidden }}
+                {{ game_form.competition.as_hidden }}
+                {{ game_form.game_type.as_hidden }}
+                {{ game_form.start_datetime.as_hidden }}
+                <input type="hidden" name="game_id" value="{{ game_form.instance.id }}" id="id_game_id">
+            </div>
+        </form>
+    {% endfor %}
+</div>
