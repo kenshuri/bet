@@ -61,7 +61,7 @@ class Competition(models.Model):
 
 
 class Game(models.Model):
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='gm_competition', null=True, blank=True)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='gm_competition', null=True, blank=True) # To change back to on_delete=models.SET_DEFAULT, default=0 and remove null=TRUE & blank=TRUE
     competition_number = models.IntegerField(unique=False, blank=True, null=True)
     team_1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_1')
     team_2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_2')
@@ -94,7 +94,8 @@ class League(models.Model):
     short_name = models.CharField(max_length=5, null=True, blank=True)
     owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0, related_name='lg_owner')
     users = models.ManyToManyField(CustomUser, related_name='lg_users')
-    competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='lg_competition')
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='lg_competition', null=True, blank=True)
+    # TO change back to competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='lg_competition')
     bonus_stake = models.IntegerField(choices=StakeChoice.choices)
     bonus_perfect = models.IntegerField(choices=PerfectChoice.choices)
     with_ext = models.BooleanField()
