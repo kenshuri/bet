@@ -49,25 +49,25 @@
                                 <div class="flex flex-grow form-control flex-row">
                                     <label class="label w-28 sm:w-32 text-nowrap" for="league_bonus_stake">Bonus "Enjeu"</label>
                                     <select name="bonus_stake" id="league_bonus_stake" class="flex flex-grow select select-bordered select-sm sm:select-md">
-                                        <option value="1">Bonus activé</option>
-                                        <option value="0">Pas de bonus</option>
+                                        <option value="1" {% if l.bonus_stake == 1 %}selected{% endif %}>Bonus activé</option>
+                                        <option value="0" {% if l.bonus_stake == 0 %}selected{% endif %}>Pas de bonus</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-grow form-control flex-row">
                                     <label class="label w-28 sm:w-32 text-nowrap" for="league_bonus_perfect">Bonus "Parfait"</label>
                                     <select name="bonus_perfect" id="league_bonus_perfect" class="flex flex-grow select select-bordered select-sm sm:select-md">
-                                        <option value="20" >20 points</option>
-                                        <option value="0">0 point</option>
-                                        <option value="10">10 points</option>
-                                        <option value="50">50 points</option>
-                                        <option value="100">100 points</option>
+                                        <option value="20"  {% if l.bonus_perfect == 20  %}selected{% endif %}>20 points</option>
+                                        <option value="0"   {% if l.bonus_perfect == 0   %}selected{% endif %}>Désactivé</option>
+                                        <option value="10"  {% if l.bonus_perfect == 10  %}selected{% endif %}>10 points</option>
+                                        <option value="50"  {% if l.bonus_perfect == 50  %}selected{% endif %}>50 points</option>
+                                        <option value="100" {% if l.bonus_perfect == 100 %}selected{% endif %}>100 points</option>
                                     </select>
                                 </div>
                                 <div class="flex flex-grow form-control flex-row">
                                     <label class="label w-28 sm:w-32 text-nowrap" for="league_with_ext">Score final</label>
                                     <select name="with_ext" id="league_with_ext" class="flex flex-grow select select-bordered select-sm sm:select-md">
-                                        <option value="1" >Après Prolongation</option>
-                                        <option value="0">Avant Prologation</option>
+                                        <option value="1" {% if l.with_ext == 1 %}selected{% endif %}>Après Prolongation</option>
+                                        <option value="0" {% if l.with_ext == 0 %}selected{% endif %}>Avant Prologation</option>
                                     </select>
                                 </div>
                             </div>
