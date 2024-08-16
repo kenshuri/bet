@@ -178,7 +178,6 @@ def league_ranking(league_id:int, user_id:int):
         pl.lit(0).alias('bets_perfect'),
         pl.lit(0).alias('user_score').cast(pl.Float64),
     )
-    user_score = 0
     for g in games:
         g_result_df, u_score = game_result(league_id=league_id, game_id=g['id'], user_id=user_id)
         # g_result_df = g_result_df.with
@@ -191,7 +190,6 @@ def league_ranking(league_id:int, user_id:int):
         ).select(
             'first_name', 'user_id', 'email', 'bets_number', 'bets_ok', 'bets_perfect', 'user_score'
         )
-        user_score += u_score
         games_results_list.append(g_result_df)
         l_result = 0
         if g_result_df.filter(pl.col('user_id') == user_id).select('bet_perfect').item() == True:
@@ -212,6 +210,7 @@ def league_ranking(league_id:int, user_id:int):
         last_results_list = [*[-1 for x in range(5-len(last_results_list))], *last_results_list]
 
     user_rank = ranking.filter(pl.col('user_id')==user_id).select('user_rank').item()
+    user_score = ranking.filter(pl.col('user_id')==user_id).select('user_score').item()
 
     return ranking, last_results_list[-4:], user_score, user_rank
 
