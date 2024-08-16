@@ -1608,10 +1608,6 @@ html {
     --btn-color: var(--fallback-p);
   }
 
-  .btn-accent {
-    --btn-color: var(--fallback-a);
-  }
-
   .btn-neutral {
     --btn-color: var(--fallback-n);
   }
@@ -1692,10 +1688,6 @@ html {
     --btn-color: var(--p);
   }
 
-  .btn-accent {
-    --btn-color: var(--a);
-  }
-
   .btn-neutral {
     --btn-color: var(--n);
   }
@@ -1707,12 +1699,6 @@ html {
   .btn-error {
     --btn-color: var(--er);
   }
-}
-
-.btn-accent {
-  --tw-text-opacity: 1;
-  color: var(--fallback-ac,oklch(var(--ac)/var(--tw-text-opacity)));
-  outline-color: var(--fallback-a,oklch(var(--a)/1));
 }
 
 .btn-neutral {

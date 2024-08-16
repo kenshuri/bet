@@ -46,12 +46,12 @@
                        class="input input-bordered">
             </div>
 
-            <button class="btn mt-2"
+            <button class="btn mt-2 btn-neutral"
                     type="submit">S'inscrire</button>
             <input type="hidden" name="next" value="{% url 'index'%}">
         </form>
-        <a href="{% url 'login' %}" class="btn btn-block btn-accent btn-outline mt-2">
-                se connecter
+        <a href="{% url 'login' %}" class="btn btn-block btn-neutral btn-outline mt-2">
+                Se connecter
         </a>
     </div>
 {% endblock %}

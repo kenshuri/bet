@@ -81,10 +81,11 @@
                                 <span class="ml-2">Compétition</span>
                             </div>
                             <div class="font-bold">
+                                {% include 'bet/components/competition_team_activity_info.html' with activity_type=game_form.instance.competition.activity_type %}
                                 {{ game_form.instance.competition }}
                             </div>
                             <div>
-                                Type de match: {{ game_form.instance.game_type }}
+                                Type de match: {% if game_form.instance.game_type == 0 %}Standard{% elif game_form.instance.game_type == 1%}Finale{% elif game_form.instance.game_type == 2%}Demi-Finale{% elif game_form.instance.game_type == 4%}Quart de finale{% else %}{{ game_form.instance.game_type}}ème de finale{% endif %}
                             </div>
                         </div>
                     </div>

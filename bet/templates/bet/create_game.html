@@ -8,6 +8,7 @@
     <div x-data class="flex flex-col p-2 gap-2">
         <h2 class="text-lg font-semibold">Créer un match</h2>
 
+{#    Create Game#}
         <div x-disclosure class="bg-green-200 border-2 border-green-500 rounded">
             <div x-disclosure:button :class="$disclosure.isOpen && 'bg-base-200'"
                  class="flex justify-between p-1 rounded-t">
@@ -70,7 +71,7 @@
                     <select name="team_1" required id="id_team_1"
                             class="select select-bordered select-sm sm:select-md">
                         {% for t in t_choices %}
-                            <option value="{{ t.id }}">{{ t.name }}</option>
+                            <option value="{{ t.id }}">{{ t.name }} - {% include 'bet/components/competition_team_activity_info.html' with activity_type=t.activity_type team=1 text=1 %}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -81,7 +82,7 @@
                     <select name="team_2" required id="id_team_2"
                             class="select select-bordered select-sm sm:select-md">
                         {% for t in t_choices %}
-                            <option value="{{ t.id }}">{{ t.name }}</option>
+                            <option value="{{ t.id }}">{{ t.name }} - {% include 'bet/components/competition_team_activity_info.html' with activity_type=t.activity_type team=1 text=1 %}</option>
                         {% endfor %}
                     </select>
                 </div>

@@ -1,7 +1,7 @@
 {% extends "bet/base.html" %}
 
 {% block title %}
-    Petites Annonces Théâtre
+    Mon GROS Prono - Connectez-vous !
 {% endblock title %}
 
 {% block main %}
@@ -39,11 +39,11 @@
                        type="password" name="password" placeholder="*************" autocomplete="current-password" required id="id_password">
             </div>
 
-            <button class="btn mt-2"
+            <button class="btn mt-2 btn-neutral"
                     type="submit">Se connecter</button>
             <input type="hidden" name="next" value="{% url 'index'%}">
         </form>
-        <a href="{% url 'signup' %}" class="btn btn-block btn-accent btn-outline mt-2">
+        <a href="{% url 'signup' %}" class="btn btn-block btn-neutral btn-outline mt-2">
             S'inscrire
         </a>
     </div>

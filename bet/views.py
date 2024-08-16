@@ -14,8 +14,9 @@ from django.utils import timezone
 from bet.utils import get_table, get_results, Result, Ranking
 
 
+
 # Create your views here.
-@login_required()
+@login_required
 def index(request):
     all_leagues = League.objects.filter(id=1)
     user_leagues = League.objects.filter(users=request.user)
@@ -32,6 +33,29 @@ def index(request):
         'rankings': rankings,
     }
     return render(request, 'bet/index.html', context=context)
+
+
+@login_required
+def rankings(request):
+    all_leagues = League.objects.filter(id=1)
+    user_leagues = League.objects.filter(users=request.user)
+    rankings = list()
+    for league in user_leagues:
+        rankings.append(Ranking(user_id=request.user.id, league_id=league.id))
+
+    table_df = get_table()
+    context = {
+        'all_leagues': all_leagues,
+        'user_leagues': user_leagues,
+        'league_id': 1,
+        'table_dict': table_df.to_dicts(),
+        'rankings': rankings,
+    }
+    return render(request, 'bet/rankings.html', context=context)
+
+
+
+
 
 @login_required
 def bets(request):
@@ -201,18 +225,17 @@ def create_game(request):
                       {'competitions_created': competitions_created, 'games': games,
                        'game_created_flag': game_created_flag})
     else:
+        # CAREFUL - Anything updated here should also be updated in create_team code
         game_form = GameForm()
         c = Competition.objects.get(id=request.GET.get('competition_id'))
-        if c.activity_type == 0:
-            t_choices = Team.objects.filter(Q(owner=request.user) | Q(owner__is_staff=True))
-        else:
-            t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(Q(owner=request.user) | Q(owner__is_staff=True))
         if c.activity_type == ActivityType.MIXED:
+            t_choices = Team.objects.filter(Q(owner=request.user) | Q(owner__is_staff=True))
             a_choices = ActivityType
         else:
-            a_choices = [{'label': 'Needed to deal with MIXED Activity', 'value':0},
-                {'label': [ca[1] for ca in ActivityType.choices if ca[0] == c.activity_type][0],
-                 'value': c.activity_type}]
+            t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(Q(owner=request.user) | Q(owner__is_staff=True))
+            a_choices = [{'label': 'Needed to deal with MIXED Activity', 'value': 0},
+                         {'label': [ca[1] for ca in ActivityType.choices if ca[0] == c.activity_type][0],
+                          'value': c.activity_type}]
         gt_choices = GameType
         return render(request, 'bet/create_game.html',
                       {'game_form': game_form, 'c': c, 't_choices': t_choices, 'a_choices': a_choices, 'gt_choices': gt_choices})
@@ -261,14 +284,15 @@ def create_team(request):
             team_created_flag = True
         else:
             team_created_flag = False
+        # CAREFUL - Anything updated here should also be updated in create_game code
         c_id = request.POST.get('team_competition_id')
         game_form = GameForm()
         c = Competition.objects.get(id=c_id)
-        t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(
-            Q(owner=request.user) | Q(owner__is_staff=True))
         if c.activity_type == ActivityType.MIXED:
+            t_choices = Team.objects.filter(Q(owner=request.user) | Q(owner__is_staff=True))
             a_choices = ActivityType
         else:
+            t_choices = Team.objects.filter(activity_type__in=[0, c.activity_type]).filter(Q(owner=request.user) | Q(owner__is_staff=True))
             a_choices = [{'label': 'Needed to deal with MIXED Activity', 'value': 0},
                          {'label': [ca[1] for ca in ActivityType.choices if ca[0] == c.activity_type][0],
                           'value': c.activity_type}]

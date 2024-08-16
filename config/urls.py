@@ -21,6 +21,7 @@ import bet.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', bet.views.index, name='index'),
+    path('rankings', bet.views.rankings, name='rankings'),
     path('bets', bet.views.bets, name='bets'),
     path('place_bet', bet.views.place_bet, name='place_bet'),
     path('leagues', bet.views.leagues, name='leagues'),

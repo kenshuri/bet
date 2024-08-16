@@ -1,0 +1,27 @@
+{% if activity_type == 1001 %}
+    {% if text == 1 %}
+        Foot
+    {% else %}
+        <i class="fa-solid fa-futbol"></i>
+    {% endif %}
+{% elif activity_type == 1002 %}
+    {% if text == 1 %}
+        Tennis
+    {% else %}
+        <i class="fa-solid fa-table-tennis-paddle-ball"></i>
+    {% endif %}
+{% else %}
+    {% if text == 1 %}
+        {% if team == 1 %}
+            Pays
+        {% else %}
+            Mixed
+        {% endif %}
+    {% else %}
+        {% if team == 1 %}
+            <i class="fa-solid fa-flag"></i>
+        {% else %}
+            <i class="fa-solid fa-star"></i>
+        {% endif %}
+    {% endif %}
+{% endif %}
