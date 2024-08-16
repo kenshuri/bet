@@ -20,7 +20,7 @@
         {% endfor %}
     </select>
 </div>
-<div id="bets_toast" class="toast toast-bottom toast-end sm:toast-top text-xs sm:text-sm">
+<div id="bets_toast" class="toast toast-end toast-top text-xs sm:text-sm">
     <div x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
          class="alert  {% if team_created_flag %} alert-success {% else %} alert-error {% endif %} flex text-wrap justify-start">
         <span class="capitalize"><i class="fa-solid fa-people-group"></i> {% if team_created_flag %} équipe créée {% else %} erreur lors de la création de l'équipe {% endif %} </span>

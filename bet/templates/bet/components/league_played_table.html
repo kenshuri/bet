@@ -24,35 +24,7 @@
             {#            League details#}
             <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
                 <div class="flex flex-col p-1 bg-base-200">
-                    <div class="flex flex-col gap-1 mb-1 sm:flex-row sm:mb-2">
-                        <div class="flex flex-col gap-1 bg-primary-content rounded p-1 mx-1 border border-primary sm:w-1/2 sm:p-2">
-                            <div class="badge badge-primary">
-                                <i class="fa-solid fa-trophy"></i>
-                                <span class="ml-2">Compétition</span>
-                            </div>
-                            <div class="font-bold">
-                                {{ l.competition }}
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary sm:w-1/2 sm:p-2">
-                            <div class="badge badge-secondary">
-                                <i class="fa-solid fa-meteor"></i>
-                                <span class="ml-2">Ligue</span>
-                            </div>
-                            <div class="font-bold">
-                                {{ l }}
-                            </div>
-                            <div>
-                                Bonus "Enjeu": {{ l.bonus_stake }}
-                            </div>
-                            <div>
-                                Bonus "Parfait": {{ l.bonus_perfect }}
-                            </div>
-                            <div>
-                                Score après-prolongation: {{ l.with_ext }}
-                            </div>
-                        </div>
-                    </div>
+                    {% include 'bet/components/competition_league_minicards.html' with league=l only %}
                 </div>
             </div>
         </div>

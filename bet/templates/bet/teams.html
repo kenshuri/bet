@@ -52,13 +52,7 @@
                                 <div class="flex">
                                     <div class="w-20 p-1 flex flex-col justify-center gap-0.5">
                                         <span class="badge badge-neutral">
-                                            {% if t.activity_type == 1001 %}
-                                                <i class="fa-solid fa-futbol"></i>
-                                            {% elif t.activity_type == 1002 %}
-                                                <i class="fa-solid fa-broom-ball"></i>
-                                            {% else %}
-                                                <i class="fa-solid fa-flag"></i>
-                                            {% endif %}
+                                            {% include 'bet/components/competition_team_activity_info.html' with activity_type=t.activity_type team=1 only %}
                                         </span>
                                     </div>
                                     <div class="flex flex-grow items-center">{{ t.name }}</div>
@@ -80,11 +74,10 @@
                                         <i class="fa-solid fa-trophy"></i>
                                         <span class="ml-2">Compétitions liées</span>
                                     </div>
-                                    {% for c in c.lg_competition.all %}
+                                    {% for c in competitions_linked %}
                                         <div class="flex gap-1 items-center">
-                                            <span class="badge badge-secondary">{{ l.sn }}</span>
-                                            <span class="flex flex-grow">{{ l.name }}</span>
-                                            <span class="badge badge-neutral"><i class="fa-solid fa-users"></i>{{ l.users.all|length }}</span>
+                                            <span class="badge badge-primary">{{ c.sn }}</span>
+                                            <span class="flex flex-grow">{{ c.name }}</span>
                                         </div>
                                     {% endfor %}
                                 </div>

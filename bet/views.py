@@ -188,6 +188,9 @@ def create_league(request):
                   {'form': form, 'ln': request.GET['league_name'], 'c_choices': c_choices})
 
 
+#TODO: Feature "Update League"
+
+
 @login_required
 def create_competition(request):
     if request.method == 'POST':
@@ -271,7 +274,9 @@ def competitions(request):
 @login_required
 def teams(request):
     teams_created = Team.objects.filter(owner=request.user)
-    return render(request, 'bet/teams.html', {'teams_created': teams_created})
+    games_linked = Game.objects.filter(Q(team_1__in=teams_created) | Q(team_2__in=teams_created))
+    competitions_linked = Competition.objects.filter(id__in=games_linked.values('competition')).distinct()
+    return render(request, 'bet/teams.html', {'teams_created': teams_created, 'competitions_linked': competitions_linked})
 
 
 def create_team(request):
@@ -300,6 +305,9 @@ def create_team(request):
         return render(request, 'bet/partials/create_game_teams.html',
                       {'game_form': game_form, 'c': c, 't_choices': t_choices, 'a_choices': a_choices, 'gt_choices': gt_choices,
                        'team_created_flag': team_created_flag})
+
+
+#TODO: Update Team feature
 
 
 

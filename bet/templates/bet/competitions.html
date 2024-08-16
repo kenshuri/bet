@@ -120,7 +120,7 @@
     </div>
 
 
-    <div id="game_updated_toasts" class="toast toast-bottom toast-end sm:toast-top text-xs sm:text-sm">
+    <div id="game_updated_toasts" class="toast toast-end toast-top text-xs sm:text-sm">
         {% if game_created_flag %}
             <div x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
                  class="alert {% if game_created_flag == 2 %} alert-success {% elif game_created_flag == 1 %} alert-error {% endif %} flex text-wrap justify-start">

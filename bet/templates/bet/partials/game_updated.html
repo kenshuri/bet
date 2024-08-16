@@ -1,4 +1,4 @@
 <div x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
-     class="alert {% if game_updated_flag %} alert-success {% else %} alert-error {% endif %} flex text-wrap justify-start">
+     class="alert {% if game_updated_flag %} alert-success {% else %} alert-error {% endif %} flex text-wrap justify-start shadow-xl">
     <span><i class="fa-solid fa-bolt-lightning"></i> {% if game_updated_flag %} {{ game.team_1 }} {{ game.score_team1 }} - {{ game.score_team2 }} {{ game.team_2 }} mis à jour {% else %} Erreur lors de la mise à jour du match {% endif %} </span>
 </div>
