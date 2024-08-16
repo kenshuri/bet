@@ -31,7 +31,8 @@ class GameType(models.IntegerChoices):
 # Create your models here.
 class Team(models.Model):
     name = models.CharField(max_length=100)
-    owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0)
+    owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=1)
+    # TODO: set back to owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0)
     activity_type = models.IntegerField(choices=ActivityType.choices)
 
     def __str__(self):
@@ -61,7 +62,8 @@ class Competition(models.Model):
 
 
 class Game(models.Model):
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='gm_competition', null=True, blank=True) # To change back to on_delete=models.SET_DEFAULT, default=0 and remove null=TRUE & blank=TRUE
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='gm_competition', null=True, blank=True)
+    #TODO: To change back to on_delete=models.SET_DEFAULT, default=0 and remove null=TRUE & blank=TRUE
     competition_number = models.IntegerField(unique=False, blank=True, null=True)
     team_1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_1')
     team_2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_2')
@@ -95,7 +97,7 @@ class League(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0, related_name='lg_owner')
     users = models.ManyToManyField(CustomUser, related_name='lg_users')
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='lg_competition', null=True, blank=True)
-    # TO change back to competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='lg_competition')
+    #TODO: TO change back to competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='lg_competition')
     bonus_stake = models.IntegerField(choices=StakeChoice.choices)
     bonus_perfect = models.IntegerField(choices=PerfectChoice.choices)
     with_ext = models.BooleanField()
