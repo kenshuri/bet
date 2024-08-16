@@ -291,12 +291,13 @@ class ResultDetail:
         self.bet_score_team2 = bet_score_team2
 
 class Result:
-    league = League
-    game = Game
-    user = CustomUser
-    result_df = pl.DataFrame
-    result_list = list
-    user_score = float
+    league: League
+    game: Game
+    user: CustomUser
+    result_df: pl.DataFrame
+    result_list: list
+    user_score: float
+    user_bet: int
 
     def __init__(self, league_id: int, game_id: int, user_id:int):
         self.league = League.objects.get(id=league_id)
@@ -307,6 +308,17 @@ class Result:
 
         self.result_df = result_df
         self.user_score = user_score
+
+        if result_df.filter(pl.col('user_id')==user_id).select('bet_perfect').item() == True:
+            user_bet = 3 #Perfect
+        elif result_df.filter(pl.col('user_id')==user_id).select('bet_correct').item() == True:
+            user_bet = 2 #Correct
+        elif result_df.filter(pl.col('user_id') == user_id).select('bet_exists').item() == True:
+            user_bet = 1 #Exists
+        else:
+            user_bet = 0 #No Bet
+
+        self.user_bet = user_bet
 
         rl = list()
         for rd in result_df.iter_rows(named=True):

@@ -42,7 +42,7 @@
                                 <div class="flex flex-grow items-center sm:justify-end">
                                     {{ r.game.team_1 }}
                                 </div>
-                                <div class="rounded p-1 border {% if not r.game.score_team1 >= 0 %}  {% elif r.game.score_team1 > r.game.score_team2 %} bg-success border-success-content text-success-content {% elif r.game.score_team1 < r.game.score_team2 %} bg-error border-error-content text-error-content {% elif r.game.score_team1 == r.game.score_team2 %} bg-warning border-warning-content text-warning-content {% endif %}">
+                                <div class="rounded p-1 border">
                                     {% if r.game.score_team1 >= 0%}
                                         {{ r.game.score_team1 }}
                                     {% else %}
@@ -54,7 +54,7 @@
                                 <div class="flex flex-grow items-center">
                                     {{ r.game.team_2 }}
                                 </div>
-                                <div class="rounded p-1 border {% if not r.game.score_team1 >= 0 %}  {% elif r.game.score_team1 < r.game.score_team2 %} bg-success border-success-content text-success-content {% elif r.game.score_team1 > r.game.score_team2 %} bg-error border-error-content text-error-content {% elif r.game.score_team1 == r.game.score_team2 %} bg-warning border-warning-content text-warning-content {% endif %}">
+                                <div class="rounded p-1 border">
                                     {% if r.game.score_team2 >= 0%}
                                         {{ r.game.score_team2 }}
                                     {% else %}
@@ -65,7 +65,30 @@
                         </div>
                     </div>
                     <div class="w-16 sm:w-24 place-content-center flex p-1 font-bold justify-center items-center">
+                        {% if r.user_bet == 0 %}
+                            <span class="flex items-center p-1 border rounded">
+                                   <i class="fa-solid fa-ban"></i>
+                            </span>
+                        {% elif r.user_bet == 1 %}
+                            <span class="flex items-center p-1 bg-error border border-error-content text-error-content rounded">
+                                   <i class="fa-solid fa-xmark"></i>
+                            </span>
+                        {% elif r.user_bet == 2 %}
+                            <span class="flex items-center p-1 bg-green-300 border border-success text-success-content rounded">
+                                   <i class="fa-solid fa-check"></i>
+                            </span>
+                        {% elif r.user_bet == 3 %}
+                            <span class="flex items-center p-1 bg-green-500 border border-success text-success-content rounded">
+                                   <i class="fa-solid fa-check-double"></i>
+                            </span>
+                        {% else %}
+                            <span class="flex items-center p-1 border rounded">
+                                <i class="fa-solid fa-minus"></i>
+                            </span>
+                        {% endif %}
+                        <span class="sm:ml-1">
                         {{ r.user_score |floatformat:1}}
+                        </span>
                     </div>
                     <div class="w-4 sm:w-24 p-1 flex flex-col items-center justify-center sm:flex-row sm:gap-1">
                     <span x-show="$disclosure.isOpen" x-cloak aria-hidden="true">
@@ -125,8 +148,8 @@
                         {% endfor %}
                     </table>
                 </div>
-{#                Competition and League minicards#}
-            {% include 'bet/components/competition_league_minicards.html' with league=r.league only%}
+                {#                Competition and League minicards#}
+                {% include 'bet/components/competition_league_minicards.html' with league=r.league only%}
             </div>
         </div>
     {% endfor %}
