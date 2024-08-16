@@ -60,7 +60,7 @@
                             <div class="flex flex-col w-1/3 gap-1 justify-end">
                                 <div class="flex gap-1">
                                     <span class="w-5"><i class="fa-solid fa-medal"></i></span>
-                                    <span class="font-semibold">{{ r.user_score }}</span>
+                                    <span class="font-semibold">{{ r.user_score |floatformat:1}}</span>
                                 </div>
                                 <div class="flex gap-1">
                                     <span class="w-5"><i class="fa-solid fa-ranking-star"></i></span>
