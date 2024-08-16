@@ -61,7 +61,7 @@ class Competition(models.Model):
 
 
 class Game(models.Model):
-    competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='gm_competition')
+    competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='gm_competition', null=True, blank=True)
     competition_number = models.IntegerField(unique=False, blank=True, null=True)
     team_1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_1')
     team_2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_2')
