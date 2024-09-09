@@ -15,8 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from ninja import NinjaAPI
+from api.api import router as api_router
 
 import bet.views
+
+api = NinjaAPI()
+api.add_router("", api_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,3 +44,9 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('signup/', bet.views.signup, name='signup'),
 ]
+
+# silk middleware
+urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
+
+# API
+urlpatterns += [path('api/', api.urls)]

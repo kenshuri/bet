@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'bet.apps.BetConfig',
     'accounts',
     'django_browser_reload',
-    'fontawesomefree'
+    'fontawesomefree',
+    'silk',
+    'api'
 ]
 
 # Custom User model
@@ -57,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -132,3 +135,5 @@ STATIC_ROOT = BASE_DIR / 'static'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SILKY_PYTHON_PROFILER = True

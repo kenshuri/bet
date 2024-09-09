@@ -33,7 +33,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=1)
     # TODO: set back to owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0)
-    activity_type = models.IntegerField(choices=ActivityType.choices)
+    activity_type = models.IntegerField(choices=ActivityType.choices, default=ActivityType.MIXED)
 
     def __str__(self):
         return f"{self.name}"
@@ -62,7 +62,7 @@ class Competition(models.Model):
 
 
 class Game(models.Model):
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='gm_competition', null=True, blank=True)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, null=True, blank=True)
     #TODO: To change back to on_delete=models.SET_DEFAULT, default=0 and remove null=TRUE & blank=TRUE
     competition_number = models.IntegerField(unique=False, blank=True, null=True)
     team_1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_1')
@@ -71,7 +71,7 @@ class Game(models.Model):
     score_team2 = models.IntegerField(null=True, blank=True)
     score_team1_after_ext = models.IntegerField(null=True, blank=True)
     score_team2_after_ext = models.IntegerField(null=True, blank=True)
-    game_type = models.IntegerField(choices=GameType.choices)
+    game_type = models.IntegerField(choices=GameType.choices, default=GameType.STANDARD)
     start_datetime = models.DateTimeField()
 
     def __str__(self):
@@ -94,13 +94,13 @@ class PerfectChoice(models.IntegerChoices):
 class League(models.Model):
     name = models.CharField(max_length=100)
     short_name = models.CharField(max_length=5, null=True, blank=True)
-    owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0, related_name='lg_owner')
-    users = models.ManyToManyField(CustomUser, related_name='lg_users')
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='lg_competition', null=True, blank=True)
+    owner = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default=0, related_name='leagues_owned')
+    users = models.ManyToManyField(CustomUser, related_name='leagues_played')
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, null=True, blank=True)
     #TODO: TO change back to competition = models.ForeignKey(Competition, on_delete=models.SET_DEFAULT, default=0, related_name='lg_competition')
-    bonus_stake = models.IntegerField(choices=StakeChoice.choices)
-    bonus_perfect = models.IntegerField(choices=PerfectChoice.choices)
-    with_ext = models.BooleanField()
+    bonus_stake = models.IntegerField(choices=StakeChoice.choices, default=StakeChoice.STAKE_0)
+    bonus_perfect = models.IntegerField(choices=PerfectChoice.choices, default=PerfectChoice.PERFECT_20)
+    with_ext = models.BooleanField(default=False)
     code = models.CharField(max_length=36, default=uuid.uuid4)
 
 

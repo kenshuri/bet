@@ -6,6 +6,7 @@ from django.contrib.auth import login, authenticate
 from django.db.models import Q
 
 import polars as pl
+from silk.profiling.profiler import silk_profile
 
 from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm, LeagueForm, CompetitionForm, GameForm, TeamForm
@@ -127,6 +128,7 @@ def place_bet(request):
 
 
 
+@silk_profile(name='View Results')
 @login_required
 def results(request):
     """

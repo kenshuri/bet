@@ -161,7 +161,7 @@ def league_ranking(league_id:int, user_id:int):
     -------
 
     """
-    users = CustomUser.objects.filter(lg_users__in=[league_id]).distinct()
+    users = CustomUser.objects.filter(leagues_played__in=[league_id]).distinct()
     competition = League.objects.filter(id=league_id).values('competition')
     games = Game.objects.filter(competition__in=competition).filter(score_team1__isnull=False).filter(score_team2__isnull=False).values('id').order_by('start_datetime')
 
