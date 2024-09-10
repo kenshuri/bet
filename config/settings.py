@@ -32,7 +32,7 @@ else:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('ENV') == 'DEV'
 
-ALLOWED_HOSTS = ['mgp.madi3459.odns.fr', '127.0.0.1', 'mongrosprono.fr']
+ALLOWED_HOSTS = ['mgp.madi3459.odns.fr', '127.0.0.1', 'mongrosprono.fr', 'dev.mongrosprono.fr']
 
 
 # Application definition
