@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+_ = load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%&qzlpn#0n8bmy+8-m5!e6vnp!k_q#i)!_1c-csr*vr_lcy&xh'
+if os.environ.get('ENV') == 'DEV':
+    SECRET_KEY = 'django-insecure-%&qzlpn#0n8bmy+8-m5!e6vnp!k_q#i)!_1c-csr*vr_lcy&xh'
+else:
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('ENV') == 'DEV'
 
 ALLOWED_HOSTS = ['mgp.madi3459.odns.fr', '127.0.0.1', 'mongrosprono.fr']
 
@@ -39,11 +46,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bet.apps.BetConfig',
     'accounts',
-    'django_browser_reload',
     'fontawesomefree',
-    'silk',
-    'api'
-]
+    'api']
+
+# Applications for dev
+if os.environ.get('ENV') == 'DEV':
+    INSTALLED_APPS += [
+        'django_browser_reload',
+        'silk',
+    ]
 
 # Custom User model
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -57,10 +68,14 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_browser_reload.middleware.BrowserReloadMiddleware',
-    'silk.middleware.SilkyMiddleware',
-]
+    'django.middleware.clickjacking.XFrameOptionsMiddleware']
+
+# Middleware for DEV
+if os.environ.get('ENV') == 'DEV':
+    MIDDLEWARE += [
+        'django_browser_reload.middleware.BrowserReloadMiddleware',
+        'silk.middleware.SilkyMiddleware',
+    ]
 
 ROOT_URLCONF = 'config.urls'
 
