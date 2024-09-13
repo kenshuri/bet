@@ -5,6 +5,12 @@ from bet.models import Competition, Team, Game, Bet
 from ninja import ModelSchema
 import datetime
 
+class TestIn(Schema):
+    name: str
+
+class TestOut(Schema):
+    name:str
+
 class TeamOut(Schema):
     name: str
     activity_type: int
@@ -30,6 +36,13 @@ class BetOut(Schema):
     score_team1: int
     score_team2: int
 
+class BetIn(Schema):
+    game_id: int
+    user_id: int
+    league_id: int
+    score_team1: int
+    score_team2: int
+
 class BetsOut(Schema):
     existing_bets: list[BetOut]
     upcoming_bets: list[BetOut]
@@ -39,6 +52,7 @@ class BetsOut(Schema):
 class PredictionOut(Schema):
     game_id: int
     start_datetime: datetime.datetime
+    started: bool
     team_1__name: str
     team_2__name: str
     score_team1: int | None = None

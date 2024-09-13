@@ -1,6 +1,33 @@
+from django.utils import timezone
+
 from bet.models import Game, Bet, League
 from accounts.models import CustomUser
 import polars as pl
+
+
+def get_predictions(user_id:int) -> pl.DataFrame:
+    upcoming_games = (Game.objects.filter(competition__league__users=user_id)
+                      .values('id', 'start_datetime',
+                              'team_1__name', 'team_2__name',
+                              'score_team1', 'score_team2',
+                              'score_team1_after_ext', 'score_team2_after_ext',
+                              'competition__name', 'competition_id', 'competition__short_name',
+                              'competition__league__name', 'competition__league__id', 'competition__league__short_name'))
+    ug = pl.from_records(list(upcoming_games)).rename({'id': 'game_id',
+                                                       'competition__league__name': 'league__name',
+                                                       'competition__league__id': 'league_id',
+                                                       'competition__league__short_name': 'league__short_name'})
+    upcoming_bets = (Bet.objects.filter(game__in=ug.get_column('game_id').unique().to_list())
+                     .filter(user_id=user_id)
+                     .values('id', 'game_id', 'league_id',
+                             'score_team1', 'score_team2'))
+    ub = pl.from_records(list(upcoming_bets)).rename(
+        {'id': 'bet_id', 'score_team1': 'bet_score_team1', 'score_team2': 'bet_score_team2'})
+    data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
+    data = data.with_columns(
+        pl.when(pl.col('start_datetime') < timezone.now()).then(True).otherwise(False).alias('started'),
+    ).sort('start_datetime','competition_id','league_id', 'game_id')
+    return data
 
 def compute_result(score1: int, score2: int):
     if score1 > score2:

@@ -46,8 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bet.apps.BetConfig',
     'accounts',
+    'api',
     'fontawesomefree',
-    'api']
+    'django_cotton']
 
 # Applications for dev
 if os.environ.get('ENV') == 'DEV':

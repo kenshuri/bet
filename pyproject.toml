@@ -14,6 +14,7 @@ django-email-blacklist = "^1.0.1"
 polars = "^1.6.0"
 fontawesomefree = "^6.6.0"
 python-dotenv = "^1.0.1"
+django-cotton = "^0.9.37"
 
 [tool.poetry.group.dev.dependencies]
 django-silk = "^5.2.0"

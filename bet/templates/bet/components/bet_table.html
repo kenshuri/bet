@@ -85,7 +85,7 @@
                 </form>
             </div>
             {#            Bet Details#}
-            <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+            <div x-cloak x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
 {#                Competition and League minicards#}
             {% include 'bet/components/competition_league_minicards.html' with league=bet_form.instance.league only%}
             </div>

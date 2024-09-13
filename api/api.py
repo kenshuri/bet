@@ -3,14 +3,14 @@ from typing import Optional
 
 from django.utils import timezone
 
-from ninja import Router, Schema
+from ninja import Router, Schema, Form
 from silk.profiling.profiler import silk_profile
 import polars as pl
 
 from accounts.models import CustomUser
 from bet.models import Team, Game, League, Bet, Competition
-from api.schemas import TeamOut, GameOut, BetOut, BetsOut, PredictionOut
-from bet.utils import Result
+from api.schemas import TeamOut, GameOut, BetOut, BetsOut, PredictionOut, TestIn, TestOut, BetIn
+from bet.utils import get_predictions
 
 router = Router()
 
@@ -22,23 +22,13 @@ def teams(request, user_id: int):
 
 @router.get("/predictions/{int:user_id}", response=list[PredictionOut])
 def predictions(request, user_id: int):
-    upcoming_games = (Game.objects.filter(competition__league__users=user_id)
-                      .values('id', 'start_datetime',
-                              'team_1__name', 'team_2__name',
-                              'score_team1', 'score_team2',
-                              'score_team1_after_ext', 'score_team2_after_ext',
-                              'competition__name', 'competition_id',
-                              'competition__league__name', 'competition__league__id'))
-    ug = pl.from_records(list(upcoming_games)).rename({'id':'game_id',
-                                                       'competition__league__name':'league__name',
-                                                       'competition__league__id':'league_id'})
-    upcoming_bets = (Bet.objects.filter(game__in=ug.get_column('game_id').unique().to_list())
-                     .filter(user_id=user_id)
-                     .values('id', 'game_id', 'league_id',
-                             'score_team1', 'score_team2'))
-    ub = pl.from_records(list(upcoming_bets)).rename({'id': 'bet_id', 'score_team1':'bet_score_team1', 'score_team2':'bet_score_team2'})
-    data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
+    # TODO: Check authentication/authorization
+    data = get_predictions(user_id)
     return data.to_dicts()
+
+@router.post("/test", response=BetOut)
+def test(request, bet: Form[BetIn]):
+    return bet
 
 
 @router.get("/games", response=list[GameOut])

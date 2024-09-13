@@ -12,7 +12,7 @@ from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm, LeagueForm, CompetitionForm, GameForm, TeamForm
 from bet.models import Game, Bet, CustomUser, League, Competition, Team, ActivityType, GameType
 from django.utils import timezone
-from bet.utils import get_table, get_results, Result, Ranking
+from bet.utils import get_table, get_results, Result, Ranking, get_predictions
 
 
 
@@ -35,6 +35,10 @@ def index(request):
     }
     return render(request, 'bet/index.html', context=context)
 
+@login_required
+def predictions(request):
+    data = get_predictions(request.user.id)
+    return render(request, "bet/predictions.html", context={'predictions':data.to_dicts() ,'predictions_json': data.write_json()})
 
 @login_required
 def rankings(request):

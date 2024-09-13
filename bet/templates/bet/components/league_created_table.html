@@ -22,7 +22,7 @@
             {#        League Summary#}
             {% include 'bet/components/league_summary_table.html' with l=l created=True %}
             {#        League details#}
-            <div x-disclosure:panel x-collapse class="flex flex-col bg-base-200">
+            <div x-cloak x-disclosure:panel x-collapse class="flex flex-col bg-base-200">
                 {#            League Settings#}
                 <div class="p-2 flex flex-col">
                     <form action="{% url 'index' %}" method="post">

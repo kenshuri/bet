@@ -1,0 +1,71 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP - Fais tes paris
+{% endblock title %}
+
+{% block main %}
+    <div class="flex flex-col mt-2 gap-2" id="bet-block">
+        <div x-data class="flex flex-col text-sm sm:text-base">
+            {#    Header        #}
+            <div class="p-2 flex font-bold border-b-2">
+                <div class="w-24">
+                    <div class="flex flex-row gap-0.5 items-center">
+                        <div class="badge badge-primary badge-sm">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <span>/</span>
+                        <div class="badge badge-secondary badge-sm">
+                            <i class="fa-solid fa-meteor"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-grow justify-center">
+                    Match
+                </div>
+                <div class="w-16 sm:w-24"></div>
+            </div>
+            {#            Predictions#}
+            <div>
+                {% for p in predictions %}
+                    {% if not p.started %}
+                    <c-prediction
+                            bet_id="{{ p.bet_id }}"
+                            game_id="{{ p.game_id }}"
+                            league_id="{{ p.league_id }}"
+                            c_sn="{{ p.competition__short_name }}"
+                            c_n="{{ p.competition__name }}"
+                            l_sn="{{ p.league__short_name }}"
+                            l_n="{{ p.league__name }}"
+                            start_datetime="{{ p.start_datetime|date:'d/m/y'}} {{ p.start_datetime|date:'H:i'}}"
+                            t1_n="{{ p.team_1__name }}"
+                            t1_s="{{ p.bet_score_team1 }}"
+                            t2_n="{{ p.team_2__name }}"
+                            t2_s="{{ p.bet_score_team2 }}"
+                    ></c-prediction>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div x-data="{ message: 'I ❤️ Alpine' }">
+                <c-card title="super"></c-card>
+                <c-card x-bind:title="message" x-text="message"></c-card>
+                <c-prediction competition__short_name="test">
+                </c-prediction>
+                <div x-bind:test="4"></div>
+                <c-prediction x-bind:competition__short_name="tata"></c-prediction>
+            </div>
+            <div>
+                <form action="api/test" method="post">
+                    <label for="id_game_id"></label>
+                    <input id="id_game_id" name="game_id" type="text" placeholder="Type here" class="input input-bordered w-full max-w-xs" />
+                </form>
+            </div>
+            <div x-data="{ predictions: {{ predictions_json }} }">
+            </div>
+
+        </div>
+    </div>
+    <div id="bets_toast" class="toast toast-end toast-top text-xs sm:text-sm">
+    </div>
+{% endblock main %}

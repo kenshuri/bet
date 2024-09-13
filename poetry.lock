@@ -40,6 +40,27 @@ files = [
 pycodestyle = ">=2.12.0"
 
 [[package]]
+name = "beautifulsoup4"
+version = "4.12.3"
+description = "Screen-scraping library"
+optional = false
+python-versions = ">=3.6.0"
+files = [
+    {file = "beautifulsoup4-4.12.3-py3-none-any.whl", hash = "sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed"},
+    {file = "beautifulsoup4-4.12.3.tar.gz", hash = "sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051"},
+]
+
+[package.dependencies]
+soupsieve = ">1.2"
+
+[package.extras]
+cchardet = ["cchardet"]
+chardet = ["chardet"]
+charset-normalizer = ["charset-normalizer"]
+html5lib = ["html5lib"]
+lxml = ["lxml"]
+
+[[package]]
 name = "django"
 version = "5.1.1"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
@@ -73,6 +94,20 @@ files = [
 [package.dependencies]
 asgiref = ">=3.6"
 django = ">=3.2"
+
+[[package]]
+name = "django-cotton"
+version = "0.9.37"
+description = "Bringing component based design to Django templates."
+optional = false
+python-versions = "<4,>=3.8"
+files = [
+    {file = "django_cotton-0.9.37-py3-none-any.whl", hash = "sha256:b917102bee417eb749df25eae75a985db0749fb8ac9711ab57fb5f78de03d8e8"},
+    {file = "django_cotton-0.9.37.tar.gz", hash = "sha256:0ccfc76d6edfc8dfaf0bb5d960c6695fff78cbcc1a3c52e263a0484b8dbbb9a5"},
+]
+
+[package.dependencies]
+beautifulsoup4 = ">=4.12.2,<4.13.0"
 
 [[package]]
 name = "django-email-blacklist"
@@ -333,6 +368,17 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "soupsieve"
+version = "2.6"
+description = "A modern CSS selector implementation for Beautiful Soup."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "soupsieve-2.6-py3-none-any.whl", hash = "sha256:e72c4ff06e4fb6e4b5a9f0f55fe6e81514581fca1515028625d0f299c602ccc9"},
+    {file = "soupsieve-2.6.tar.gz", hash = "sha256:e2e68417777af359ec65daac1057404a3c8a5455bb8abc36f1a9866ab1a51abb"},
+]
+
+[[package]]
 name = "sqlparse"
 version = "0.5.1"
 description = "A non-validating SQL parser."
@@ -372,4 +418,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "ec2f980ea6dc586401e4f737a458a8cc4a24d18f9c6edc9ef8d8cc214b396650"
+content-hash = "e1f74c7fdbdc5bfe9c34ce237d2061bac50ebc3ae3f7c2a9912583a450734b9d"

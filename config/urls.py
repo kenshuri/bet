@@ -28,6 +28,7 @@ urlpatterns = [
     path('', bet.views.index, name='index'),
     path('rankings', bet.views.rankings, name='rankings'),
     path('bets', bet.views.bets, name='bets'),
+    path('predictions', bet.views.predictions, name='predictions'),
     path('place_bet', bet.views.place_bet, name='place_bet'),
     path('leagues', bet.views.leagues, name='leagues'),
     path('create_league', bet.views.create_league, name='create_league'),

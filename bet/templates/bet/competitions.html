@@ -68,7 +68,7 @@
                             </div>
 
                             {#            Competition details#}
-                            <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+                            <div x-cloak x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
                                 <div class="flex flex-col flex-grow gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary">
                                     <div class="badge badge-secondary">
                                         <i class="fa-solid fa-meteor"></i>
@@ -122,7 +122,7 @@
 
     <div id="game_updated_toasts" class="toast toast-end toast-top text-xs sm:text-sm">
         {% if game_created_flag %}
-            <div x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
+            <div x-cloak x-data="{dismissed: false}" x-show="!dismissed" x-init="setTimeout(() => dismissed=true, 2000)"
                  class="alert {% if game_created_flag == 2 %} alert-success {% elif game_created_flag == 1 %} alert-error {% endif %} flex text-wrap justify-start">
                 <span><i class="fa-solid fa-bolt-lightning"></i> {% if game_created_flag == 2 %} Match créé {% elif game_created_flag == 1 %} Erreur lors de la création du match {% endif %} </span>
             </div>

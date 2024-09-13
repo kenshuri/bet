@@ -22,7 +22,7 @@
             {#        League Summary#}
             {% include 'bet/components/league_summary_table.html' with l=l %}
             {#            League details#}
-            <div x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
+            <div x-cloak x-disclosure:panel x-collapse class="flex flex-col gap-1 bg-base-200">
                 <div class="flex flex-col p-1 bg-base-200">
                     {% include 'bet/components/competition_league_minicards.html' with league=l only %}
                 </div>
