@@ -1,0 +1,53 @@
+<div class="p-1 border-b">
+    {#            Bet Summary#}
+    <form hx-post="{% url 'place_bet' %}"
+          hx-target="#bets_toast"
+          hx-swap="beforeend"
+          hx-trigger="input delay:500ms, submit">
+        {% csrf_token %}
+        <div class="flex">
+            <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
+                <span class="badge badge-primary"
+                      x-text="p.competition__short_name || p.competition__name.substring(0,5)">
+                </span>
+                <span class="badge badge-secondary"
+                      x-text="p.league__short_name || p.league__name.substring(0,5)">>
+                </span>
+            </div>
+            <div class="flex flex-grow p-1 pt-0 flex-col gap-0.5">
+                <div class="flex justify-center">
+                    <div class="badge badge-sm flex gap-2 m-1 sm:badge-md">
+                        <i class="fa-solid fa-clock"></i>
+                        <span x-text="p.start_datetime_str"></span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-2">
+                    <div class="flex flex-grow gap-1">
+                        <div class="flex flex-grow items-center sm:justify-end">
+                            <span x-text="p.team_1__name"></span>
+                        </div>
+                        <div class="form-control">
+                            <label class="label hidden" for="id_score_team1"></label>
+                            <input @keydown.enter.stop required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
+                                   name="score_team1" id="id_score_team1" x-model="p.bet_score_team1"/>
+                        </div>
+                    </div>
+                    <div class="flex flex-grow gap-1 sm:flex-row-reverse">
+                        <div class="flex flex-grow items-center">
+                            <span x-text="p.team_2__name"></span>
+                        </div>
+                        <div class="form-control">
+                            <label class="label hidden" for="id_score_team2"></label>
+                            <input @keydown.enter.stop required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
+                                   name="score_team2" id="id_score_team2" x-model="p.bet_score_team2"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <input class="hidden" name="game" x-model="p.game_id">
+            <input class="hidden" name="league" x-model="p.league_id">
+        </div>
+    </form>
+</div>
