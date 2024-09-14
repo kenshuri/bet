@@ -50,9 +50,12 @@ class BetsOut(Schema):
 
 
 class PredictionOut(Schema):
+    id_temp: int
     game_id: int
     start_datetime: datetime.datetime
+    start_datetime_str: str
     started: bool
+    todo: bool
     team_1__name: str
     team_2__name: str
     score_team1: int | None = None

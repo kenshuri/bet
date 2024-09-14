@@ -26,6 +26,10 @@ def get_predictions(user_id:int) -> pl.DataFrame:
     data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
     data = data.with_columns(
         pl.when(pl.col('start_datetime') < timezone.now()).then(True).otherwise(False).alias('started'),
+        pl.col('start_datetime').dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str"),
+        pl.arange(1, data.shape[0] + 1).alias("id_temp"),
+    ).with_columns(
+        pl.when((pl.col('started') == False) & (pl.col('bet_id').is_null())).then(True).otherwise(False).alias('todo'),
     ).sort('start_datetime','competition_id','league_id', 'game_id')
     return data
 
