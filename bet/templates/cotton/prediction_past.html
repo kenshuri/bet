@@ -1,10 +1,5 @@
 <div class="p-1 border-b" :hidden="!filteredPredictions.some(prediction => prediction.id_temp === p.id_temp)">
     {#            Bet Summary#}
-    <form hx-post="{% url 'place_bet' %}"
-          hx-target="#bets_toast"
-          hx-swap="beforeend"
-          hx-trigger="input delay:500ms, submit">
-        {% csrf_token %}
         <div class="flex">
             <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
                 <span class="badge badge-primary"
@@ -27,9 +22,7 @@
                             <span x-text="p.team_1__name"></span>
                         </div>
                         <div class="form-control">
-                            <label class="label hidden" for="id_score_team1"></label>
-                            <input @keydown.enter.stop required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
-                                   name="score_team1" id="id_score_team1" x-model="p.bet_score_team1"/>
+                            <span class="font-semibold text-lg" x-text="p.bet_score_team1"></span>
                         </div>
                     </div>
                     <div class="flex flex-grow gap-1 sm:flex-row-reverse">
@@ -37,17 +30,10 @@
                             <span x-text="p.team_2__name"></span>
                         </div>
                         <div class="form-control">
-                            <label class="label hidden" for="id_score_team2"></label>
-                            <input @keydown.enter.stop required min="0" type="number" placeholder="X" class="input input-bordered input-xs w-10 sm:input-sm sm:w-12"
-                                   name="score_team2" id="id_score_team2" x-model="p.bet_score_team2"/>
+                            <span class="font-semibold text-lg" x-text="p.bet_score_team2"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div>
-            <input class="hidden" name="game" x-model="p.game_id">
-            <input class="hidden" name="league" x-model="p.league_id">
-        </div>
-    </form>
 </div>

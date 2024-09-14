@@ -81,8 +81,8 @@
                     </div>
                     <div class="flex flex-wrap gap-2 items-center">
                         <div class="join">
-                            <button @click="updateStatusFilter('upcoming')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'upcoming' }">A venir</button>
-                            <button @click="updateStatusFilter('todo')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'todo' }">A faire</button>
+                            <button @click="updateStatusFilter('upcoming')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'upcoming' }">À venir</button>
+                            <button @click="updateStatusFilter('todo')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'todo' }">À faire</button>
                             <button @click="updateStatusFilter('past')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'past' }">Passés</button>
                         </div>
                         <div class="flex flex-row gap-2 items-center">
@@ -113,10 +113,17 @@
                         </div>
                     </div>
                 </div>
-                <template x-for="p in filteredPredictions"
+                <template x-for="p in predictions"
                           :key="p.id_temp"
                 >
-                    <c-prediction></c-prediction>
+                    <div>
+                        <template x-if="p.started === false">
+                            <c-prediction></c-prediction>
+                        </template>
+                        <template x-if="p.started === true">
+                            <c-prediction_past></c-prediction_past>
+                        </template>
+                    </div>
                 </template>
             </div>
 
