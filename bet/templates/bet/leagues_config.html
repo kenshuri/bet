@@ -1,0 +1,64 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP - Leagues
+{% endblock title %}
+
+{% block main %}
+    <div class="flex flex-col p-2 gap-2">
+        {#    Join a league#}
+        <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold mt-2">Rejoindre une ligue</h2>
+            <form action="{% url 'join_league' %}" method="post">
+                {% csrf_token %}
+                <div class="flex flex-grow gap-1">
+                    <div class="flex flex-grow form-control w-2/3">
+                        <label class="label hidden" for="league_code"></label>
+                        <input type="text" placeholder="Code de la Ligue" required
+                               class="flex flex-grow input input-bordered input-sm sm:input-md "
+                               name="league_code" id="league_code" />
+                    </div>
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" type="submit">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span class="hidden sm:flex">Rejoindre</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        {#    My played leagues#}
+        <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold">Mes ligues rejointes</h2>
+            <div class="flex flex-col">
+                {% include 'bet/components/league_played_table.html' with leagues=leagues_played %}
+            </div>
+        </div>
+
+        {#        Create a league#}
+        <div class="flex flex-col gap-1 mt-2">
+            <h2 class="text-lg font-semibold">Créer une ligue</h2>
+            <form action="{% url 'create_league' %}" method="get">
+                {% csrf_token %}
+                <div class="flex flex-grow gap-1">
+                    <div class="flex flex-grow form-control w-2/3">
+                        <label class="label hidden" for="league_name"></label>
+                        <input type="text" placeholder="Nom de la Ligue" required
+                               class="flex flex-grow input input-bordered input-sm sm:input-md"
+                               name="league_name" id="league_name"/>
+                    </div>
+                    <button class="flex gap-1 btn btn-sm btn-success sm:btn-md" >
+                        <i class="fa-solid fa-meteor"></i>
+                        <span class="hidden sm:flex">Créer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {#    My Created Leagues#}
+        <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-semibold">Mes ligues créées</h2>
+            <div class="flex flex-col">
+                {% include 'bet/components/league_created_table.html' with leagues=leagues_created %}
+            </div>
+        </div>
+    </div>
+{% endblock main %}

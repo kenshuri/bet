@@ -12,7 +12,7 @@ from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm, LeagueForm, CompetitionForm, GameForm, TeamForm
 from bet.models import Game, Bet, CustomUser, League, Competition, Team, ActivityType, GameType
 from django.utils import timezone
-from bet.utils import get_table, get_results, Result, Ranking, get_predictions
+from bet.utils import get_table, get_results, Result, Ranking, get_predictions, get_leagues
 
 
 
@@ -39,6 +39,10 @@ def index(request):
 def predictions(request):
     data = get_predictions(request.user.id)
     return render(request, "bet/predictions.html", context={'predictions':data.to_dicts() ,'predictions_json': data.write_json()})
+
+def leagues(request):
+    data = get_leagues(request.user.id)
+    return render(request, "bet/leagues.html", context={'leagues': data})
 
 @login_required
 def rankings(request):
@@ -169,13 +173,13 @@ def results(request):
     return render(request, 'bet/results.html', context=context)
 
 @login_required
-def leagues(request):
+def leagues_config(request):
     leagues_played = League.objects.filter(users = request.user)
     leagues_created = League.objects.filter(owner=request.user)
-    return render(request, 'bet/leagues.html', {'leagues': leagues_played,
+    return render(request, 'bet/leagues_config.html', {'leagues': leagues_played,
                                                 'leagues_created': leagues_created,
                                                 'leagues_played': leagues_played
-                                                })
+                                                       })
 
 
 @login_required

@@ -80,5 +80,12 @@ class UserScoreOut(Schema):
     bet_perfect_count: int
     total_points: float
 
+
 class LeagueOut(Schema):
     league_id: int
+    league__name: str
+    league__short_name: str | None = None
+    competition_id: int
+    competition__name: str
+    competition__short_name: str | None = None
+    user_score: list[UserScoreOut]

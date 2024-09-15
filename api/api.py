@@ -9,8 +9,8 @@ import polars as pl
 
 from accounts.models import CustomUser
 from bet.models import Team, Game, League, Bet, Competition
-from api.schemas import TeamOut, GameOut, BetOut, BetsOut, PredictionOut, TestIn, TestOut, BetIn
-from bet.utils import get_predictions, get_leagues
+from api.schemas import TeamOut, GameOut, BetOut, BetsOut, PredictionOut, TestIn, TestOut, BetIn, LeagueOut
+from bet.utils import get_predictions, get_leagues, LeagueScore
 
 router = Router()
 
@@ -26,10 +26,13 @@ def predictions(request, user_id: int):
     data = get_predictions(user_id)
     return data.to_dicts()
 
+@router.get("/leagues/{int:user_id}", response=list[LeagueOut])
 def leagues(request, user_id: int):
     # TODO: Check authentication/authorization
     data = get_leagues(user_id)
-    for league in data:
+    x = [LeagueScore(data[i]) for i in range(len(data))]
+    return x
+
 
 @router.post("/test", response=BetOut)
 def test(request, bet: Form[BetIn]):

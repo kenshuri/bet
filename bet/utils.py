@@ -5,7 +5,7 @@ from accounts.models import CustomUser
 import polars as pl
 
 
-def get_predictions(user_id:int) -> pl.DataFrame:
+def get_predictions(user_id:int) -> list[pl.DataFrame]:
     upcoming_games = (Game.objects.filter(competition__league__users=user_id)
                       .values('id', 'start_datetime',
                               'team_1__name', 'team_2__name',
@@ -26,18 +26,32 @@ def get_predictions(user_id:int) -> pl.DataFrame:
     data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
     data = data.with_columns(
         pl.when(pl.col('start_datetime') < timezone.now()).then(True).otherwise(False).alias('started'),
-        pl.col('start_datetime').dt.convert_time_zone("Europe/Paris").dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str"),
-        pl.arange(1, data.shape[0] + 1).alias("id_temp"),
-    ).with_columns(
-        pl.when((pl.col('started') == False) & (pl.col('bet_id').is_null())).then(True).otherwise(False).alias('todo'),
+        pl.col('start_datetime').dt.convert_time_zone("Europe/Paris").dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str")
+    ).with_row_index('id_temp', offset=1
+    ).with_columns(pl.when((pl.col('started') == False) & (pl.col('bet_id').is_null())).then(True).otherwise(False).alias('todo'),
     ).sort('start_datetime','competition_id','league_id', 'game_id')
     return data
 
 
-def get_league(league_id: int) -> pl.DataFrame:
-    league_games = Game.objects.filter(competition__league=league_id)
 
-    return pl.DataFrame()
+
+class LeagueScore:
+    league_id: int
+    league__name: str
+    league__short_name: str | None = None
+    competition_id: int
+    competition_name: str
+    competition_short_name: str | None = None
+    user_score: dict
+
+    def __init__(self, df):
+        self.league_id = df['league_id'].item(0)
+        self.league__name = df['league__name'].item(0)
+        self.league__short_name = df['league__short_name'].item(0)
+        self.competition_id = df['competition_id'].item(0)
+        self.competition__name = df['competition__name'].item(0)
+        self.competition__short_name = df['competition__short_name'].item(0)
+        self.user_score = df.to_dicts()
 
 
 def get_leagues(user_id:int) -> pl.DataFrame:
@@ -144,7 +158,8 @@ def get_leagues(user_id:int) -> pl.DataFrame:
         ]
     ).sort('league_id', 'total_points', 'first_name',
            descending=[False, True, False])
-    return leagues
+    leagues_list = [leagues.filter(pl.col('league_id') == id) for id in leagues.get_column('league_id').unique().to_list()]
+    return leagues_list
 
 
 def compute_result(score1: int, score2: int):
