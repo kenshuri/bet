@@ -63,8 +63,10 @@ class PredictionOut(Schema):
     score_team1_after_ext: int | None = None
     score_team2_after_ext: int | None = None
     competition__name: str
+    competition__short_name: str | None = None
     competition_id: int
     league__name: str
+    league__short_name: str | None = None
     league_id: int
     bet_id: int | None = None
     bet_score_team1: int | None = None

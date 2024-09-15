@@ -55,10 +55,73 @@ def get_leagues(user_id:int) -> pl.DataFrame:
                                                        'competition__league__name': 'league__name',
                                                        'competition__league__id': 'league_id',
                                                        'competition__league__short_name': 'league__short_name'})
-    league_users = CustomUser.objects.filter(leagues_played__in=ug.get_column('league_id').unique().to_list()).values('id', 'leagues_played')
+    league_users = CustomUser.objects.filter(
+        leagues_played__in=ug.get_column('league_id').unique().to_list()
+    ).values('id', 'leagues_played', 'leagues_played__bonus_perfect',
+             'leagues_played__bonus_stake', 'leagues_played__with_ext')
     lu = pl.from_records(list(league_users)).rename({'id': 'user_id'})
 
     data = ug.join(lu, how='left', left_on='league_id', right_on='leagues_played')
+
+    users_bets = Bet.objects.filter(
+        user_id__in=data.get_column('user_id').unique().to_list()
+    ).filter(
+        league_id__in=data.get_column('league_id').unique().to_list()
+    ).values('id', 'league_id', 'user_id', 'game_id', 'score_team1', 'score_team2')
+    ub = pl.from_records(list(users_bets)).rename({
+        'id':'bet_id',
+        'score_team1': 'bet_score_team1',
+        'score_team2': 'bet_score_team2',
+    })
+
+    data = data.join(ub, how='left', on=['user_id', 'league_id', 'game_id'])
+
+    data = data.rename({
+        'score_team1': 'score_team1_before_ext',
+        'score_team2': 'score_team2_before_ext',
+    }).with_columns(
+        pl.when((pl.col('leagues_played__with_ext') == True) &
+                (pl.col('score_team1_after_ext').is_not_null()) &
+                (pl.col('score_team2_after_ext').is_not_null()))
+        .then(True)
+        .otherwise(False).alias('result_after_ext')
+    ).with_columns(
+        pl.when(pl.col('result_after_ext') == True)
+        .then('score_team1_after_ext')
+        .otherwise('score_team1_before_ext')
+        .alias('score_team1'),
+        pl.when(pl.col('result_after_ext') == True)
+        .then('score_team2_after_ext')
+        .otherwise('score_team2_before_ext')
+        .alias('score_team2')
+    ).with_columns(
+        pl.when(pl.col('score_team1')>pl.col('score_team2')).then(1)
+        .when(pl.col('score_team1')<pl.col('score_team2')).then(2)
+        .when(pl.col('score_team1')==pl.col('score_team2')).then(3)
+        .otherwise(0).alias('game_result'),
+        pl.when(pl.col('bet_score_team1')>pl.col('bet_score_team2')).then(1)
+        .when(pl.col('bet_score_team1')<pl.col('bet_score_team2')).then(2)
+        .when(pl.col('bet_score_team1')==pl.col('bet_score_team2')).then(3)
+        .otherwise(0).alias('bet_result')
+    ).with_columns(
+        pl.when(pl.col('bet_result') != 0)
+        .then(True).otherwise(False).alias('bet_exists'),
+        pl.when(pl.col('bet_result') == pl.col('game_result'))
+        .then(True).otherwise(False).alias('bet_ok'),
+        pl.when((pl.col('score_team1') == pl.col('bet_score_team1'))
+                & (pl.col('score_team2') == pl.col('bet_score_team2')))
+        .then(True).otherwise(False).alias('bet_perfect')
+    )
+
+    bet_calc = data.group_by(['game_id', 'league_id']).agg(
+        [pl.col('bet_ok').sum().alias('bet_ok_count'),
+         pl.col('bet_perfect').sum().alias('bet_perfect_count'),
+         ]
+    )
+
+    data.join(bet_calc, on=['game_id', 'league_id'], how='left').with_columns(
+        pl.col('')
+    )
     return pl.DataFrame()
 
 
