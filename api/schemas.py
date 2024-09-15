@@ -72,5 +72,13 @@ class PredictionOut(Schema):
     bet_score_team1: int | None = None
     bet_score_team2: int | None = None
 
+class UserScoreOut(Schema):
+    user_id: int
+    first_name: str
+    bet_exists_count: int
+    bet_ok_count: int
+    bet_perfect_count: int
+    total_points: float
+
 class LeagueOut(Schema):
     league_id: int

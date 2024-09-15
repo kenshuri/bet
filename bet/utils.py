@@ -44,7 +44,7 @@ def get_leagues(user_id:int) -> pl.DataFrame:
     user_games = Game.objects.filter(competition__league__users=user_id).filter(
         score_team1__isnull=False, score_team2__isnull=False
     ).values(
-        'id', 'start_datetime',
+        'id', 'start_datetime', 'game_type',
         'team_1__name', 'team_2__name',
         'score_team1', 'score_team2',
         'score_team1_after_ext', 'score_team2_after_ext',
@@ -57,7 +57,7 @@ def get_leagues(user_id:int) -> pl.DataFrame:
                                                        'competition__league__short_name': 'league__short_name'})
     league_users = CustomUser.objects.filter(
         leagues_played__in=ug.get_column('league_id').unique().to_list()
-    ).values('id', 'leagues_played', 'leagues_played__bonus_perfect',
+    ).values('id', 'first_name', 'leagues_played', 'leagues_played__bonus_perfect',
              'leagues_played__bonus_stake', 'leagues_played__with_ext')
     lu = pl.from_records(list(league_users)).rename({'id': 'user_id'})
 
@@ -119,10 +119,32 @@ def get_leagues(user_id:int) -> pl.DataFrame:
          ]
     )
 
-    data.join(bet_calc, on=['game_id', 'league_id'], how='left').with_columns(
-        pl.col('')
+    data = data.join(bet_calc, on=['game_id', 'league_id'], how='left').with_columns(
+        pl.when(pl.col('bet_ok') == True)
+        .then(100 / pl.col('bet_ok_count'))
+        .otherwise(0).alias('ok_points'),
+        pl.when(pl.col('bet_perfect') == True)
+        .then(pl.col('leagues_played__bonus_perfect') / pl.col('bet_perfect_count'))
+        .otherwise(0).alias('perfect_points'),
+    ).with_columns(
+        pl.when((pl.col('leagues_played__bonus_stake') == 1) & (pl.col('game_type') != 0))
+        .then(1 + 1/pl.col('game_type')).otherwise(1).alias('stake_factor'),
+    ).with_columns(
+        ((pl.col('ok_points') + pl.col('perfect_points')) * pl.col('stake_factor')).round(4).alias('total_points'),
     )
-    return pl.DataFrame()
+
+    leagues = data.group_by(['league_id', 'league__name', 'league__short_name',
+                   'competition_id', 'competition__name', 'competition__short_name',
+                   'user_id', 'first_name']).agg(
+        [
+            pl.col('bet_exists').sum().alias('bet_exists_count'),
+            pl.col('bet_ok').sum().alias('bet_ok_count'),
+            pl.col('bet_perfect').sum().alias('bet_perfect_count'),
+            pl.col('total_points').sum().alias('total_points'),
+        ]
+    ).sort('league_id', 'total_points', 'first_name',
+           descending=[False, True, False])
+    return leagues
 
 
 def compute_result(score1: int, score2: int):
