@@ -69,3 +69,6 @@ class PredictionOut(Schema):
     bet_id: int | None = None
     bet_score_team1: int | None = None
     bet_score_team2: int | None = None
+
+class LeagueOut(Schema):
+    league_id: int

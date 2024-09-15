@@ -33,6 +33,35 @@ def get_predictions(user_id:int) -> pl.DataFrame:
     ).sort('start_datetime','competition_id','league_id', 'game_id')
     return data
 
+
+def get_league(league_id: int) -> pl.DataFrame:
+    league_games = Game.objects.filter(competition__league=league_id)
+
+    return pl.DataFrame()
+
+
+def get_leagues(user_id:int) -> pl.DataFrame:
+    user_games = Game.objects.filter(competition__league__users=user_id).filter(
+        score_team1__isnull=False, score_team2__isnull=False
+    ).values(
+        'id', 'start_datetime',
+        'team_1__name', 'team_2__name',
+        'score_team1', 'score_team2',
+        'score_team1_after_ext', 'score_team2_after_ext',
+        'competition__name', 'competition_id', 'competition__short_name',
+        'competition__league__name', 'competition__league__id', 'competition__league__short_name'
+    )
+    ug = pl.from_records(list(user_games)).rename({'id': 'game_id',
+                                                       'competition__league__name': 'league__name',
+                                                       'competition__league__id': 'league_id',
+                                                       'competition__league__short_name': 'league__short_name'})
+    league_users = CustomUser.objects.filter(leagues_played__in=ug.get_column('league_id').unique().to_list()).values('id', 'leagues_played')
+    lu = pl.from_records(list(league_users)).rename({'id': 'user_id'})
+
+    data = ug.join(lu, how='left', left_on='league_id', right_on='leagues_played')
+    return pl.DataFrame()
+
+
 def compute_result(score1: int, score2: int):
     if score1 > score2:
         return "W"
