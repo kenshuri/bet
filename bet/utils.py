@@ -23,11 +23,16 @@ def get_predictions(user_id:int) -> list[pl.DataFrame]:
                      .filter(user_id=user_id)
                      .values('id', 'game_id', 'league_id',
                              'score_team1', 'score_team2'))
-    if not upcoming_bets.exists():
-        return pl.DataFrame()
-    ub = pl.from_records(list(upcoming_bets)).rename(
-        {'id': 'bet_id', 'score_team1': 'bet_score_team1', 'score_team2': 'bet_score_team2'})
-    data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
+    if upcoming_bets.exists():
+        ub = pl.from_records(list(upcoming_bets)).rename(
+            {'id': 'bet_id', 'score_team1': 'bet_score_team1', 'score_team2': 'bet_score_team2'})
+        data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
+    else:
+        data = ug.with_columns(
+            pl.lit(None).cast(pl.Int64).alias('bet_id'),
+            pl.lit(None).cast(pl.Int64).alias('bet_score_team1'),
+            pl.lit(None).cast(pl.Int64).alias('bet_score_team2'),
+        ).sort('game_id', 'league_id')
     data = data.with_columns(
         pl.when(pl.col('start_datetime') < timezone.now()).then(True).otherwise(False).alias('started'),
         pl.col('start_datetime').dt.convert_time_zone("Europe/Paris").dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str")
