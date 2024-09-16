@@ -4,7 +4,7 @@ from typing import Optional
 from django.utils import timezone
 
 from ninja import Router, Schema, Form
-from silk.profiling.profiler import silk_profile
+# from silk.profiling.profiler import silk_profile
 import polars as pl
 
 from accounts.models import CustomUser
