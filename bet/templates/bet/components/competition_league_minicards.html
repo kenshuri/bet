@@ -2,16 +2,6 @@
     <div class="flex flex-col gap-1 bg-primary-content rounded p-1 mx-1 border border-primary sm:w-1/2 sm:p-2">
         <div class="badge badge-primary">
             <i class="fa-solid fa-trophy"></i>
-            <span class="ml-2">Compétition</span>
-        </div>
-        <div class="font-bold">
-            {% include 'bet/components/competition_team_activity_info.html' with activity_type=league.competition.activity_type only %}
-            {{ league.competition }}
-        </div>
-    </div>
-    <div class="flex flex-col gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary sm:w-1/2 sm:p-2">
-        <div class="badge badge-secondary">
-            <i class="fa-solid fa-meteor"></i>
             <span class="ml-2">Ligue</span>
         </div>
         <div class="font-bold">
@@ -25,6 +15,16 @@
         </div>
         <div>
             Score après-prolongation: {% if league.with_ext == 1 %}Activé{% else %}Désactivé{% endif %}
+        </div>
+    </div>
+    <div class="flex flex-col gap-1 bg-secondary-content rounded p-1 mx-1 border border-secondary sm:w-1/2 sm:p-2">
+        <div class="badge badge-secondary">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="ml-2">Compétition</span>
+        </div>
+        <div class="font-bold">
+            {% include 'bet/components/competition_team_activity_info.html' with activity_type=league.competition.activity_type only %}
+            {{ league.competition }}
         </div>
     </div>
 </div>

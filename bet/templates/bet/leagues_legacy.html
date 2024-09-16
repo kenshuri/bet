@@ -1,0 +1,13 @@
+{% extends "bet/base.html" %}
+
+{% block title %}
+    MGP
+{% endblock title %}
+
+{% block main %}
+    {% if user_leagues %}
+        <div class="flex flex-col mt-2 gap-2">
+        {% include 'bet/components/ranking_table.html' with rankings=rankings %}
+        </div>
+    {% endif %}
+{% endblock main %}

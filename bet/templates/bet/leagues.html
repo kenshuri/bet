@@ -7,8 +7,14 @@
 {% block main %}
     <div class="flex flex-col mt-2 gap-2" id="league-block">
     {% for league in leagues %}
-        {{ league }}
-        <c-league_score league_name="{{ league__name }}"></c-league_score>
+        <c-league_summary
+                league_id="{{ league.league_id }}"
+                league_name="{{ league.league__name }}"
+                league_sn="{{ league.league__short_name }}"
+                competition_id="{{ league.competition_id }}"
+                competition_name="{{ league.competition__name }}"
+                competition_sn="{{ league.competition__short_name }}"
+        ></c-league_summary>
     {% endfor %}
     </div>
 {% endblock main %}

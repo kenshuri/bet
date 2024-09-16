@@ -5,9 +5,31 @@
 {% endblock title %}
 
 {% block main %}
-    {% if user_leagues %}
-        <div class="flex flex-col mt-2 gap-2">
-        {% include 'bet/components/ranking_table.html' with rankings=rankings %}
+    <h2 class="flex p-2 mt-4  text-lg justify-center sm:justify-start">Bonjour <span class="mx-1 font-bold">{{ first_name }}</span>👋</h2>
+
+    {#    Prochains Matchs#}
+    <div>
+        <h3 class="flex p-2 font-semibold">Mes prochains pronos</h3>
+        <div x-data="{
+                filteredPredictions: {{ predictions_json }} }">
+            <template x-for="p in filteredPredictions" :key="p.id_temp">
+                <c-prediction></c-prediction>
+            </template>
         </div>
-    {% endif %}
+    </div>
+    {#    Derniers résultats#}
+    <div>
+        <h3 class="flex mt-4 sm:mt-8  p-2 font-semibold">Mes derniers résultats</h3>
+        <div x-data="{
+            results: {{ results_json }},
+            user_id: {{ user_id }},
+            filteredResults: {{ results_json }}
+         }">
+            <template x-for="p in results" :key="p.id_temp">
+                <c-result></c-result>
+            </template>
+        </div>
+    </div>
+
+    <div id="bets_toast" class="toast toast-end toast-top text-xs sm:text-sm">
 {% endblock main %}

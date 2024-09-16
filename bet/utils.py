@@ -13,6 +13,8 @@ def get_predictions(user_id:int) -> list[pl.DataFrame]:
                               'score_team1_after_ext', 'score_team2_after_ext',
                               'competition__name', 'competition_id', 'competition__short_name',
                               'competition__league__name', 'competition__league__id', 'competition__league__short_name'))
+    if not upcoming_games.exists():
+        return pl.DataFrame()
     ug = pl.from_records(list(upcoming_games)).rename({'id': 'game_id',
                                                        'competition__league__name': 'league__name',
                                                        'competition__league__id': 'league_id',
@@ -21,6 +23,8 @@ def get_predictions(user_id:int) -> list[pl.DataFrame]:
                      .filter(user_id=user_id)
                      .values('id', 'game_id', 'league_id',
                              'score_team1', 'score_team2'))
+    if not upcoming_bets.exists():
+        return pl.DataFrame()
     ub = pl.from_records(list(upcoming_bets)).rename(
         {'id': 'bet_id', 'score_team1': 'bet_score_team1', 'score_team2': 'bet_score_team2'})
     data = ug.join(ub, how='left', on=['game_id', 'league_id']).sort('game_id', 'league_id')
@@ -28,8 +32,8 @@ def get_predictions(user_id:int) -> list[pl.DataFrame]:
         pl.when(pl.col('start_datetime') < timezone.now()).then(True).otherwise(False).alias('started'),
         pl.col('start_datetime').dt.convert_time_zone("Europe/Paris").dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str")
     ).with_row_index('id_temp', offset=1
-    ).with_columns(pl.when((pl.col('started') == False) & (pl.col('bet_id').is_null())).then(True).otherwise(False).alias('todo'),
-    ).sort('start_datetime','competition_id','league_id', 'game_id')
+                     ).with_columns(pl.when((pl.col('started') == False) & (pl.col('bet_id').is_null())).then(True).otherwise(False).alias('todo'),
+                                    ).sort('start_datetime','competition_id','league_id', 'game_id')
     return data
 
 
@@ -54,7 +58,7 @@ class LeagueScore:
         self.user_score = df.to_dicts()
 
 
-def get_leagues(user_id:int) -> pl.DataFrame:
+def get_results(user_id:int) -> pl.DataFrame:
     user_games = Game.objects.filter(competition__league__users=user_id).filter(
         score_team1__isnull=False, score_team2__isnull=False
     ).values(
@@ -65,10 +69,12 @@ def get_leagues(user_id:int) -> pl.DataFrame:
         'competition__name', 'competition_id', 'competition__short_name',
         'competition__league__name', 'competition__league__id', 'competition__league__short_name'
     )
+    if not user_games.exists():
+        return pl.DataFrame()
     ug = pl.from_records(list(user_games)).rename({'id': 'game_id',
-                                                       'competition__league__name': 'league__name',
-                                                       'competition__league__id': 'league_id',
-                                                       'competition__league__short_name': 'league__short_name'})
+                                                   'competition__league__name': 'league__name',
+                                                   'competition__league__id': 'league_id',
+                                                   'competition__league__short_name': 'league__short_name'})
     league_users = CustomUser.objects.filter(
         leagues_played__in=ug.get_column('league_id').unique().to_list()
     ).values('id', 'first_name', 'leagues_played', 'leagues_played__bonus_perfect',
@@ -83,7 +89,7 @@ def get_leagues(user_id:int) -> pl.DataFrame:
         league_id__in=data.get_column('league_id').unique().to_list()
     ).values('id', 'league_id', 'user_id', 'game_id', 'score_team1', 'score_team2')
     ub = pl.from_records(list(users_bets)).rename({
-        'id':'bet_id',
+        'id': 'bet_id',
         'score_team1': 'bet_score_team1',
         'score_team2': 'bet_score_team2',
     })
@@ -109,13 +115,13 @@ def get_leagues(user_id:int) -> pl.DataFrame:
         .otherwise('score_team2_before_ext')
         .alias('score_team2')
     ).with_columns(
-        pl.when(pl.col('score_team1')>pl.col('score_team2')).then(1)
-        .when(pl.col('score_team1')<pl.col('score_team2')).then(2)
-        .when(pl.col('score_team1')==pl.col('score_team2')).then(3)
+        pl.when(pl.col('score_team1') > pl.col('score_team2')).then(1)
+        .when(pl.col('score_team1') < pl.col('score_team2')).then(2)
+        .when(pl.col('score_team1') == pl.col('score_team2')).then(3)
         .otherwise(0).alias('game_result'),
-        pl.when(pl.col('bet_score_team1')>pl.col('bet_score_team2')).then(1)
-        .when(pl.col('bet_score_team1')<pl.col('bet_score_team2')).then(2)
-        .when(pl.col('bet_score_team1')==pl.col('bet_score_team2')).then(3)
+        pl.when(pl.col('bet_score_team1') > pl.col('bet_score_team2')).then(1)
+        .when(pl.col('bet_score_team1') < pl.col('bet_score_team2')).then(2)
+        .when(pl.col('bet_score_team1') == pl.col('bet_score_team2')).then(3)
         .otherwise(0).alias('bet_result')
     ).with_columns(
         pl.when(pl.col('bet_result') != 0)
@@ -142,14 +148,60 @@ def get_leagues(user_id:int) -> pl.DataFrame:
         .otherwise(0).alias('perfect_points'),
     ).with_columns(
         pl.when((pl.col('leagues_played__bonus_stake') == 1) & (pl.col('game_type') != 0))
-        .then(1 + 1/pl.col('game_type')).otherwise(1).alias('stake_factor'),
+        .then(1 + 1 / pl.col('game_type')).otherwise(1).alias('stake_factor'),
     ).with_columns(
         ((pl.col('ok_points') + pl.col('perfect_points')) * pl.col('stake_factor')).round(4).alias('total_points'),
+    ).with_row_index('id_temp', offset=1
+                     ).with_columns(
+        pl.col('start_datetime').dt.convert_time_zone("Europe/Paris").dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str")
+    ).with_columns(
+        pl.when(pl.col('bet_perfect')==True).then(3)
+        .when(pl.col('bet_ok') == True).then(2)
+        .when(pl.col('bet_exists') == True).then(1)
+        .otherwise(0).alias('user_bet'),
+        pl.col('total_points').round(0).alias('total_points_rounded'),
+    ).with_columns(
+        pl.concat_str(['league_id', 'game_id'], separator='_').alias('league_game_ids')
+    )
+    return data
+
+def get_results_as_user(user_id:int):
+    results = get_results(user_id)
+    if results.shape[0] == 0:
+        return pl.DataFrame()
+    results_as_user = results.filter(pl.col('user_id') == user_id)
+
+    results_details = [
+        results.filter(
+            pl.col('league_game_ids') == lg_id
+        ).sort(
+            'total_points', 'bet_exists', 'first_name', descending=[True, True, False]
+        ).to_dicts()
+        for lg_id in results.get_column('league_game_ids').unique().sort().to_list()
+    ]
+
+    results_as_user = results_as_user.sort('league_game_ids')
+
+    results_as_user = results_as_user.with_columns(
+        pl.Series('results_details', results_details)
     )
 
+    results_as_user = results_as_user.sort('start_datetime', 'league_id', descending=[True, False])
+
+    return results_as_user
+
+
+
+def get_leagues(user_id:int) -> pl.DataFrame:
+    data = get_results(user_id)
+    if data.shape[0] == 0:
+        return pl.DataFrame()
+
     leagues = data.group_by(['league_id', 'league__name', 'league__short_name',
-                   'competition_id', 'competition__name', 'competition__short_name',
-                   'user_id', 'first_name']).agg(
+                             'competition_id', 'competition__name', 'competition__short_name',
+                             'leagues_played__bonus_perfect', 'leagues_played__bonus_stake',
+                             'leagues_played__with_ext',
+                             'user_id', 'first_name']).agg(
         [
             pl.col('bet_exists').sum().alias('bet_exists_count'),
             pl.col('bet_ok').sum().alias('bet_ok_count'),
@@ -495,7 +547,7 @@ class Result:
         self.result_list = rl
 
 
-def get_results(game_id:int):
+def get_game_results(game_id:int):
     game_qs = Game.objects.filter(pk=game_id).values('id', 'score_team1', 'score_team2')
     if not game_qs.exists():
         return pl.DataFrame()

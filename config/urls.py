@@ -25,11 +25,14 @@ api.add_router("", api_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', bet.views.index, name='index'),
+    path('leagues_legacy', bet.views.leagues_legacy, name='leagues_legacy'),
     path('rankings', bet.views.rankings, name='rankings'),
     path('bets', bet.views.bets, name='bets'),
     path('predictions', bet.views.predictions, name='predictions'),
     path('leagues', bet.views.leagues, name='leagues'),
+    path('league/<int:league_id>', bet.views.league, name='league'),
     path('place_bet', bet.views.place_bet, name='place_bet'),
     path('leagues_config', bet.views.leagues_config, name='leagues_config'),
     path('create_league', bet.views.create_league, name='create_league'),
@@ -43,7 +46,6 @@ urlpatterns = [
     path('join_league', bet.views.join_league, name='join_league'),
     path('quit_league/<int:league_id>', bet.views.quit_league, name='quit_league'),
     path('__reload__/', include('django_browser_reload.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
     path('signup/', bet.views.signup, name='signup'),
 ]
 

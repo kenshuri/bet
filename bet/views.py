@@ -12,13 +12,36 @@ from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm, LeagueForm, CompetitionForm, GameForm, TeamForm
 from bet.models import Game, Bet, CustomUser, League, Competition, Team, ActivityType, GameType
 from django.utils import timezone
-from bet.utils import get_table, get_results, Result, Ranking, get_predictions, get_leagues
+from bet.utils import get_table, get_game_results, Result, Ranking, get_predictions, get_leagues, get_results, get_results_as_user
 
 
 
 # Create your views here.
 @login_required
 def index(request):
+    user = CustomUser.objects.get(id=request.user.id)
+    predictions = get_predictions(request.user.id)
+    if predictions.shape[0] !=0:
+        predictions_next = predictions.filter(pl.col('start_datetime') > timezone.now()).sort('start_datetime').head(3)
+    else:
+        predictions_next = predictions
+    results = get_results_as_user(request.user.id)
+    if results.shape[0] !=0:
+        results_last = results.sort('start_datetime', 'league_id', descending=[True, False]).head(3)
+    else:
+        results_last = results
+
+    context = {
+        'first_name': user.first_name,
+        'predictions_json': predictions_next.write_json(),
+        'results_json': results_last.write_json(),
+        'user_id': request.user.id,
+    }
+    return render(request, 'bet/index.html', context=context)
+
+
+@login_required
+def leagues_legacy(request):
     all_leagues = League.objects.filter(id=1)
     user_leagues = League.objects.filter(users=request.user)
     rankings = list()
@@ -33,16 +56,89 @@ def index(request):
         'table_dict': table_df.to_dicts(),
         'rankings': rankings,
     }
-    return render(request, 'bet/index.html', context=context)
+    return render(request, 'bet/leagues_legacy.html', context=context)
+
 
 @login_required
 def predictions(request):
     data = get_predictions(request.user.id)
-    return render(request, "bet/predictions.html", context={'predictions':data.to_dicts() ,'predictions_json': data.write_json()})
+    results = get_results_as_user(request.user.id)
+    context = {
+        'predictions_json': data.write_json(),
+        'results_json': results.write_json(),
+        'user_id': request.user.id,
+    }
+    return render(request, "bet/predictions.html", context=context)
 
 def leagues(request):
-    data = get_leagues(request.user.id)
-    return render(request, "bet/leagues.html", context={'leagues': data})
+    leagues_df = get_leagues(request.user.id)
+    leagues = [{
+        'league_id': league.item(0, 'league_id'),
+        'league__name': league.item(0, 'league__name'),
+        'league__short_name': league.item(0, 'league__short_name'),
+        'competition_id': league.item(0, 'competition_id'),
+        'competition__name': league.item(0, 'competition__name'),
+        'competition__short_name': league.item(0, 'competition__short_name'),
+        'league_details': league.sort(
+            'total_points', 'first_name', 'user_id', descending=[True, False, False]
+        ).with_columns(
+            pl.col('total_points').rank(method='ordinal', descending=True).alias('user_rank_ordinal'),
+            pl.col('total_points').rank(method='min', descending=True).alias('user_rank'),
+        ).filter(
+            (pl.col('user_rank_ordinal').is_in([1,2,3]) | (pl.col('user_id') == request.user.id))
+        ).select(
+            'user_rank', 'user_id', 'first_name', 'bet_exists_count', 'bet_ok_count', 'bet_perfect_count', 'total_points'
+        ).to_dicts(),
+    } for league in leagues_df]
+    context = {
+        'leagues': leagues,
+    }
+    return render(request, "bet/leagues.html", context=context)
+
+
+@login_required
+def league(request, league_id:int):
+    #TODO: check case where league exist but no game defined on the league
+    predictions = get_predictions(request.user.id).filter(league_id=league_id)
+    results = get_results_as_user(request.user.id).filter(league_id=league_id)
+    leagues_df = get_leagues(request.user.id)
+    league_list = [{
+        'league_id': league.item(0, 'league_id'),
+        'league__name': league.item(0, 'league__name'),
+        'league__short_name': league.item(0, 'league__short_name'),
+        'leagues_played__bonus_perfect': league.item(0, 'leagues_played__bonus_perfect'),
+        'leagues_played__bonus_stake': league.item(0, 'leagues_played__bonus_stake'),
+        'leagues_played__with_ext': league.item(0, 'leagues_played__with_ext'),
+        'competition_id': league.item(0, 'competition_id'),
+        'competition__name': league.item(0, 'competition__name'),
+        'competition__short_name': league.item(0, 'competition__short_name'),
+        'league_details': league.sort(
+            'total_points', 'first_name', 'user_id', descending=[True, False, False]
+        ).with_columns(
+            pl.col('total_points').rank(method='ordinal', descending=True).alias('user_rank_ordinal'),
+            pl.col('total_points').rank(method='min', descending=True).alias('user_rank'),
+        ).select(
+            'user_rank', 'user_id', 'first_name', 'bet_exists_count', 'bet_ok_count', 'bet_perfect_count',
+            'total_points',
+        ).to_dicts(),
+    } for league in leagues_df if league.item(0, 'league_id') == league_id]
+    if len(league_list) > 0:
+        league = league_list[0]
+    else:
+        league = None
+    if len(league_list) > 0 and predictions.shape[0] > 0 and results.shape[0] > 0:
+        league_exists = True
+    else:
+        league_exists = False
+    context = {
+        'league_exists': league_exists,
+        'predictions_json': predictions.write_json(),
+        'results_json': results.write_json(),
+        'league': league,
+        'user_id': request.user.id,
+    }
+    return render(request, "bet/league.html", context=context)
+
 
 @login_required
 def rankings(request):
@@ -165,7 +261,7 @@ def results(request):
     games = Game.objects.filter(start_datetime__lt=timezone.now()).order_by('-start_datetime')
     bets_dict = dict()
     for game in games:
-        bets_dict[game.id] = get_results(game.id).to_dicts()
+        bets_dict[game.id] = get_game_results(game.id).to_dicts()
     context = {'bets_dict': bets_dict,
                'games': games,
                'user_leagues':user_leagues,
@@ -272,7 +368,7 @@ def update_game(request):
 @login_required
 def competitions(request):
     competitions_created = Competition.objects.filter(owner=request.user)
-    games_owner = Game.objects.filter(competition__owner=request.user).order_by('start_datetime', 'competition_id')
+    games_owner = Game.objects.filter(competition__owner=request.user).order_by('-start_datetime', 'competition_id')
     games = list()
     for g in games_owner:
         game_form = GameForm(instance=g)

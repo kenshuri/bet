@@ -59,7 +59,7 @@
               class="flex flex-col gap-1">
             {% csrf_token %}
             <div>
-                <div class="badge badge-primary"><i class="fa-solid fa-trophy"></i> <span class="ml-1">{{ c.name }}</span></div>
+                <div class="badge badge-secondary"><i class="fa-solid fa-calendar-days"></i> <span class="ml-1">{{ c.name }}</span></div>
                 <input type="hidden" value="{{ c.id }}" name="competition" id="id_competition">
             </div>
             {#            Teams to be updated if new team added#}

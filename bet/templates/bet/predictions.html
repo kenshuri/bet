@@ -10,10 +10,13 @@
             {#            Predictions#}
             <div x-data="{
                 predictions: {{ predictions_json }},
+                results: {{ results_json }},
+                user_id: {{ user_id }},
                 statusFilter: 'upcoming',
                 selectedCompetition: -1,
                 selectedLeague: -1,
                 filteredPredictions: [],
+                filteredResults: [],
                 competition_choices: [],
                 league_choices: [],
 
@@ -26,6 +29,26 @@
                 updateStatusFilter(status) {
                     this.statusFilter = status
                     this.filterPredictions()
+                    this.filterResults()
+                },
+
+                filterResults() {
+                    let filteredResults = [];
+
+                    if (this.statusFilter === 'past') {
+                        filteredResults = this.results;
+                    }
+
+                    if (parseInt(this.selectedCompetition, 10)  !== -1) {
+                        filteredResults = filteredResults.filter(result => result.competition_id === parseInt(this.selectedCompetition, 10))
+                    }
+
+                    if (parseInt(this.selectedLeague, 10)  !== -1) {
+                        filteredResults = filteredResults.filter(result => result.league_id === parseInt(this.selectedLeague, 10))
+                    }
+
+                    this.filteredResults = filteredResults
+
                 },
 
                 filterPredictions() {
@@ -36,7 +59,7 @@
                     }  if (this.statusFilter === 'todo') {
                         filteredPredictions = filteredPredictions.filter(prediction => prediction.todo === true)
                     } else if (this.statusFilter === 'past') {
-                        filteredPredictions = filteredPredictions.filter(prediction => prediction.started === true)
+                        filteredPredictions = []
                     }
 
                     if (parseInt(this.selectedCompetition, 10)  !== -1) {
@@ -48,6 +71,11 @@
                     }
 
                     this.filteredPredictions = filteredPredictions
+                },
+
+                filter() {
+                    this.filterPredictions()
+                    this.filterResults()
                 },
 
                 createCompetitionChoices() {
@@ -79,7 +107,7 @@
                     <div>
                         <i class="fa-solid fa-filter"></i>
                     </div>
-                    <div class="flex flex-wrap gap-2 items-center">
+                    <div class="flex flex-wrap gap-2 sm:gap-4 items-center">
                         <div class="join">
                             <button @click="updateStatusFilter('upcoming')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'upcoming' }">À venir</button>
                             <button @click="updateStatusFilter('todo')" class="btn btn-sm join-item" :class="{ 'btn-active': statusFilter === 'todo' }">À faire</button>
@@ -91,21 +119,21 @@
                                     <i class="fa-solid fa-trophy"></i>
                                 </div>
                                 <select class="select select-bordered select-sm select-primary max-w-24"
-                                        x-model="selectedCompetition" @change="filterPredictions">
+                                        x-model="selectedLeague" @change="filter">
                                     <option value="-1" selected>Toutes</option>
-                                    <template x-for="choice in competition_choices" :key="choice.id">
+                                    <template x-for="choice in league_choices" :key="choice.id">
                                         <option :value="choice.id" x-text="choice.name"></option>
                                     </template>
                                 </select>
                             </div>
                             <div class="flex items-center gap-1 bg-secondary-content border rounded border-secondary p-1">
                                 <div class="badge badge-secondary">
-                                    <i class="fa-solid fa-meteor"></i>
+                                    <i class="fa-solid fa-calendar-days"></i>
                                 </div>
                                 <select class="select select-bordered select-sm select-secondary max-w-24"
-                                        x-model="selectedLeague" @change="filterPredictions">
+                                        x-model="selectedCompetition" @change="filter">
                                     <option value="-1" selected>Toutes</option>
-                                    <template x-for="choice in league_choices" :key="choice.id">
+                                    <template x-for="choice in competition_choices" :key="choice.id">
                                         <option :value="choice.id" x-text="choice.name"></option>
                                     </template>
                                 </select>
@@ -124,6 +152,9 @@
                             <c-prediction_past></c-prediction_past>
                         </template>
                     </div>
+                </template>
+                <template x-for="p in results">
+                    <c-result></c-result>
                 </template>
             </div>
 

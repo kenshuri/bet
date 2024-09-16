@@ -37,6 +37,9 @@
                 <label for="id_password" class="label">Mot de passe</label>
                 <input class="input  input-bordered"
                        type="password" name="password" placeholder="*************" autocomplete="current-password" required id="id_password">
+                <div class="flex items-end">
+                    <a class="link" href="{% url 'password_reset' %}">Mot de passe oublié ?</a>
+                </div>
             </div>
 
             <button class="btn mt-2 btn-neutral"

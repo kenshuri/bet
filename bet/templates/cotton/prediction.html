@@ -8,10 +8,10 @@
         <div class="flex">
             <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
                 <span class="badge badge-primary"
-                      x-text="p.competition__short_name || p.competition__name.substring(0,5)">
+                      x-text="p.league__short_name || p.league__name.substring(0,5)">
                 </span>
                 <span class="badge badge-secondary"
-                      x-text="p.league__short_name || p.league__name.substring(0,5)">>
+                      x-text="p.competition__short_name || p.competition__name.substring(0,5)">
                 </span>
             </div>
             <div class="flex flex-grow p-1 pt-0 flex-col gap-0.5">
@@ -45,10 +45,10 @@
                 </div>
             </div>
             <div class="flex flex-shrink p-2 items-center justify-center">
-                <a href="{% url 'bets' %}">
-                    <button type="button" class="btn btn-sm btn-secondary">
-                        <i class="fa-solid fa-meteor"></i>
-                        <span>Voir</span>
+                <a :href="'/league/'+ p.league_id">
+                    <button type="button" class="btn btn-sm px-4 btn-primary">
+                        <i class="fa-solid fa-trophy"></i>
+                        <span class="hidden sm:flex">Voir la ligue</span>
                     </button>
                 </a>
             </div>

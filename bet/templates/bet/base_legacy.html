@@ -30,7 +30,7 @@
         {#    Title Bar  #}
         <div class="flex justify-between items-center">
             <div class="flex">
-                <a class="gap-1 flex items-center" href="{% url 'index' %}">
+                <a class="gap-1 flex items-center" href="{% url 'rankings' %}">
                     <div class="">
                         <div class="w-16 md:w-20 m-1">
                             <img alt="logo" src="{% static 'mgp-Kittl.svg' %}" />
@@ -38,13 +38,6 @@
                     </div>
                     <span class="flex font-bold text-base md:text-xl">Mon GROS prono</span>
                 </a>
-                <div class="hidden sm:flex items-center ml-4">
-                    <ul class="join">
-                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-home"></i> <span class="ml-2">Accueil</span> </a></li>
-                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'predictions' %}"><i class="fa-solid fa-gavel"></i> <span class="ml-2">Mes Pronos</span></a></li>
-                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'leagues' %}"><i class="fa-solid fa-trophy"></i><span class="ml-2">Mes Ligues</span></a></li>
-                    </ul>
-                </div>
             </div>
             <div class="flex mr-2 ">
                 {% if user.is_authenticated %}
@@ -60,10 +53,7 @@
                                 <li class="p-2 underline mb-2">
                                     {{ user.email }}
                                 </li>
-                                <li><a class=""><i class="fa-solid fa-user-pen"></i>Mon profil</a></li>
-                                <li><a href="{% url 'leagues_config' %}"><i class="fa-solid fa-trophy"></i>Gérer mes ligues</a></li>
-                                <li><a href="{% url 'competitions' %}"><i class="fa-solid fa-calendar-days"></i>Gérer mes compétitions</a></li>
-                                <li><a href="{% url 'teams' %}"><i class="fa-solid fa-people-group"></i>Gérer mes équipes</a></li>
+                                <li><a><i class="fa-solid fa-user-pen"></i>Mon profil</a></li>
                                 <form method="post" action="{% url 'logout' %}">
                                     <li>
                                         {% csrf_token %}
@@ -87,12 +77,63 @@
         </div>
         {% if user.is_authenticated %}
             {#    Navigation bars    #}
-            <div class="flex sm:hidden justify-center">
+            <div x-data x-popover class="relative ml-2 hidden sm:flex">
                 <ul class="join">
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'index' %}"><i class="fa-solid fa-home"></i> <span class="ml-2">Accueil</span> </a></li>
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'predictions' %}"><i class="fa-solid fa-gavel"></i> <span class="ml-2">Mes Pronos</span></a></li>
-                    <li class="btn join-item p-2"><a class="capitalize" href="{% url 'leagues' %}"><i class="fa-solid fa-trophy"></i><span class="ml-2">Mes Ligues</span></a></li>
+                    <li x-popover:button class="btn btn-neutral join-item dropdown flex items-center"><i class="fa-solid fa-bars"></i>
+                    </li>
+                    <div x-popover:panel
+                         x-cloak
+                         x-transition.origin.top.left
+                         class="absolute left-0 top-12 mt-2 w-40 bg-white rounded-md shadow-2xl z-10">
+                        <ul class="menu bg-base-100 rounded-box w-60 p-2 shadow">
+                            <li>
+                                <h2 class="menu-title"><i class="fa-solid fa-gamepad mr-2"></i>Jouer</h2>
+                                <ul>
+                                    <li><a class="capitalize" href="{% url 'rankings' %}"><i class="fa-solid fa-ranking-star"></i>Classement</a></li>
+                                    <li><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i>Paris</a></li>
+                                    <li><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i>Résultats</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <h2 class="menu-title"><i class="fa-solid fa-wrench mr-2"></i>Gérer</h2>
+                                <ul>
+                                    <li><a class="capitalize" href="{% url 'leagues' %}"><i class="fa-solid fa-meteor"></i></i>Mes ligues</a></li>
+                                    <li><a class="capitalize" href="{% url 'competitions' %}"><i class="fa-solid fa-trophy"></i>Mes compétitions</a></li>
+                                    <li><a class="capitalize" href="{% url 'teams' %}"><i class="fa-solid fa-people-group"></i></i>Mes équipes</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    {% if request.path in '/rankings /bets /results' %}
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'rankings' %}"><i class="fa-solid fa-ranking-star"></i> Classement</a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'bets' %}"><i class="fa-solid fa-gavel"></i> Paris</a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'results' %}"><i class="fa-solid fa-square-poll-horizontal"></i> Résultats</a></li>
+                    {% else %}
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'leagues' %}"><i class="fa-solid fa-meteor"></i>
+                            <span class="sm:hidden"> Ligues</span>
+                            <span class="hidden sm:inline"> Mes Ligues</span></a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'competitions' %}"><i class="fa-solid fa-trophy"></i>
+                            <span class="sm:hidden"> Compét'</span>
+                            <span class="hidden sm:inline"> Mes Compétitions</span></a></li>
+                        <li class="btn join-item p-2"><a class="capitalize" href="{% url 'teams' %}"><i class="fa-solid fa-people-group"></i>
+                            <span class="sm:hidden"> équipes</span>
+                            <span class="hidden sm:inline"> Mes équipes</span></a></li>
+
+                    {% endif %}
                 </ul>
+            </div>
+            <div class="flex sm:hidden">
+                <div class="btm-nav">
+                    <a href="{% url 'index' %}">
+                        <i class="fa-solid fa-home"></i>
+                    </a>
+                    <a href="{% url 'predictions' %}">
+                        <i class="fa-solid fa-gavel"></i>
+                    </a>
+                    <a href="{% url 'leagues' %}">
+                        <i class="fa-solid fa-meteor"></i>
+                    </a>
+                </div>
             </div>
         {% endif %}
     </div>
@@ -102,14 +143,14 @@
     {%  endblock main %}
 </main>
 <footer class="footer items-center p-4 bg-neutral text-neutral-content max-w-3xl mx-auto lg:max-w-4xl xl:max-w-6xl mt-2">
-    <aside class="items-center grid-flow-col">
+    <aside class="mb-16 sm:mb-0 items-center grid-flow-col">
         <div class="">
             <div class="w-16">
                 <img alt="logo" src="{% static 'mgp-Kittl.svg' %}" />
             </div>
         </div>
         <div>
-            Kenshuri va encore gagner
+            Kenshuri va gagner
         </div>
     </aside>
 </footer>
