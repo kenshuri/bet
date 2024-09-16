@@ -288,7 +288,7 @@ def place_bet(request):
 
 
 
-@silk_profile(name='View Results')
+# @silk_profile(name='View Results')
 @login_required
 def results(request):
     """
