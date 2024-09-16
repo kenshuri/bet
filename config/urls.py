@@ -51,7 +51,7 @@ urlpatterns = [
 ]
 
 # silk middleware
-urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
+# urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
 
 # API
 urlpatterns += [path('api/', api.urls)]
