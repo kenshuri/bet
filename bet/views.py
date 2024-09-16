@@ -101,7 +101,9 @@ def leagues(request):
 def league(request, league_id:int):
     #TODO: check case where league exist but no game defined on the league
     predictions = get_predictions(request.user.id).filter(league_id=league_id)
-    results = get_results_as_user(request.user.id).filter(league_id=league_id)
+    results = get_results_as_user(request.user.id)
+    if results.shape[0] > 0:
+        results.filter(league_id=league_id)
     leagues_df = get_leagues(request.user.id)
     league_list = [{
         'league_id': league.item(0, 'league_id'),
