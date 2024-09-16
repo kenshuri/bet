@@ -484,6 +484,7 @@ def join_league(request):
     return redirect('league', league_id)
 
 
+@login_required
 def join_league_with_code(request, league_code:str):
     league_qs = League.objects.filter(code=league_code)
     if len(league_qs) == 1:
