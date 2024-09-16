@@ -10,6 +10,9 @@
     </h2>
     {#    Paramètres de la ligue#}
     <div class="flex flex-wrap px-2 gap-2 justify-center sm:justify-start">
+        <div class="badge badge-secondary badge-sm">
+                {{ league.competition__name }}
+        </div>
         <div class="badge badge-neutral badge-sm">
             Bonus Parfait <span class="ml-2 font-semibold">{{ league.leagues_played__bonus_perfect }} points</span>
         </div>

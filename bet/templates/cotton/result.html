@@ -120,7 +120,7 @@
                 </template>
             </table>
             <div class="flex flex-shrink p-2 items-center justify-end">
-                <a href="{% url 'bets' %}">
+                <a :href="'/league/'+ p.league_id">
                     <button type="button" class="btn btn-sm px-4 btn-primary">
                         <i class="fa-solid fa-trophy"></i>
                         <span class="flex">Voir la ligue</span>
