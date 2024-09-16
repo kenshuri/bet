@@ -125,8 +125,61 @@ def league(request, league_id:int):
     if len(league_list) > 0:
         league = league_list[0]
     else:
-        league = None
-    if len(league_list) > 0 and predictions.shape[0] > 0 and results.shape[0] > 0:
+        l = League.objects.filter(id=league_id).values(
+            'id', 'name', 'short_name',
+            'bonus_perfect', 'bonus_stake', 'with_ext',
+            'competition_id','competition__name', 'competition__short_name',
+        )
+        if l.exists():
+            l_df = pl.from_records(list(l)).rename({
+                'id': 'league_id',
+                'name': 'league__name',
+                'short_name': 'league__short_name',
+                'bonus_perfect': 'leagues_played__bonus_perfect',
+                'bonus_stake': 'leagues_played__bonus_stake',
+                'with_ext': 'leagues_played__with_ext',
+
+            })
+            users = CustomUser.objects.filter(leagues_played=l_df.item(0, 'league_id')).values('id', 'first_name')
+            if users.exists():
+                users_df = pl.from_records(list(users)).rename({
+                    'id': 'user_id',
+                }).with_columns(
+                    pl.lit(l_df.item(0, 'league_id')).cast(pl.Int64).alias('league_id'),
+                    pl.lit(0).alias('bet_exists_count'),
+                    pl.lit(0).alias('bet_ok_count'),
+                    pl.lit(0).alias('bet_perfect_count'),
+                    pl.lit(0).alias('total_points'),
+                )
+                league_data = l_df.join(users_df, how='left', on='league_id')
+                league = {
+                    'league_id': league_data.item(0, 'league_id'),
+                    'league__name': league_data.item(0, 'league__name'),
+                    'league__short_name': league_data.item(0, 'league__short_name'),
+                    'leagues_played__bonus_perfect': league_data.item(0, 'leagues_played__bonus_perfect'),
+                    'leagues_played__bonus_stake': league_data.item(0, 'leagues_played__bonus_stake'),
+                    'leagues_played__with_ext': league_data.item(0, 'leagues_played__with_ext'),
+                    'competition_id': league_data.item(0, 'competition_id'),
+                    'competition__name': league_data.item(0, 'competition__name'),
+                    'competition__short_name': league_data.item(0, 'competition__short_name'),
+                    'league_details': league_data.sort(
+                        'total_points', 'first_name', 'user_id', descending=[True, False, False]
+                    ).with_columns(
+                        pl.col('total_points').rank(method='ordinal', descending=True).alias('user_rank_ordinal'),
+                        pl.col('total_points').rank(method='min', descending=True).alias('user_rank'),
+                    ).select(
+                        'user_rank', 'user_id', 'first_name', 'bet_exists_count', 'bet_ok_count', 'bet_perfect_count',
+                        'total_points',
+                    ).to_dicts()
+                }
+
+            else:
+                league = None
+
+        else:
+            league = None
+
+    if league is not None:
         league_exists = True
     else:
         league_exists = False
