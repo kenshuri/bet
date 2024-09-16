@@ -1,0 +1,78 @@
+<div class="p-1 border-b">
+    <div class="flex justify-between">
+        <div class="w-24 p-1 flex flex-col justify-center gap-0.5">
+            <span class="badge badge-primary">
+                {% if league_sn != 'None' %}
+                    {{ league_sn }}
+                {% else %}
+                    {{ league_name|slice:5 }}
+                {% endif %}
+            </span>
+            <span class="badge badge-secondary">
+                {% if competition_sn != 'None' %}
+                    {{ competition_sn }}
+                {% else %}
+                    {{ competition_name|slice:5 }}
+                {% endif %}
+            </span>
+        </div>
+        <div>
+            <table class="table table-xs sm:table-sm">
+                <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        Joueur
+                    </th>
+                    <th>
+                        Pronos
+                    </th>
+                    <th class="hidden sm:table-cell">
+                        Pronos Justes
+                    </th>
+                    <th class="hidden md:table-cell">
+                        Pronos Parfaits
+                    </th>
+                    <th>
+                        Points
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in league.league_details %}
+                    <tr class="{% if user.user_id == request.user.id %} font-bold {% endif %}">
+                        <td>
+                            {{ user.user_rank }}
+                        </td>
+                        <td>
+                            {{ user.first_name|truncatechars:15 }}
+                        </td>
+                        <td>
+                            {{ user.bet_exists_count }}
+                        </td>
+                        <td class="hidden sm:table-cell">
+                            {{ user.bet_ok_count }}
+                        </td>
+                        <td class="hidden md:table-cell">
+                            {{ user.bet_perfect_count }}
+                        </td>
+                        <td>
+                            {{ user.total_points |floatformat:0}}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="flex flex-shrink p-2 items-center justify-center">
+            <a href="{% url 'bets' %}">
+                <button type="button" class="btn btn-sm px-4 btn-primary">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span class="hidden sm:flex">Voir la ligue</span>
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
