@@ -96,6 +96,7 @@ def leagues(request):
     return render(request, "bet/leagues.html", context=context)
 
 
+
 @login_required
 def league(request, league_id:int):
     #TODO: check case where league exist but no game defined on the league
@@ -476,8 +477,18 @@ def join_league(request):
         league_qs = League.objects.filter(code=league_code)
         if len(league_qs) == 1:
             league = league_qs.get()
+            league_id = league.id
             league.users.add(request.user)
-    return redirect('leagues')
+    return redirect('league', league_id)
+
+
+def join_league_with_code(request, league_code:str):
+    league_qs = League.objects.filter(code=league_code)
+    if len(league_qs) == 1:
+        league = league_qs.get()
+        league_id = league.id
+        league.users.add(request.user)
+    return redirect('league', league_id)
 
 def quit_league(request, league_id):
     league = get_object_or_404(League, pk=league_id)
