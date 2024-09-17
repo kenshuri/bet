@@ -119,9 +119,9 @@
                                 <div class="badge badge-primary">
                                     <i class="fa-solid fa-trophy"></i>
                                 </div>
-                                <select class="select select-bordered select-sm select-primary max-w-24"
+                                <select class="select select-bordered select-sm select-primary max-w-24 sm:max-w-32 md:max-w-48"
                                         x-model="selectedLeague" @change="filter">
-                                    <option value="-1" selected>Toutes</option>
+                                    <option value="-1" selected>Toutes les ligues</option>
                                     <template x-for="choice in league_choices" :key="choice.id">
                                         <option :value="choice.id" x-text="choice.name"></option>
                                     </template>
@@ -131,9 +131,9 @@
                                 <div class="badge badge-secondary">
                                     <i class="fa-solid fa-calendar-days"></i>
                                 </div>
-                                <select class="select select-bordered select-sm select-secondary max-w-24"
+                                <select class="select select-bordered select-sm select-secondary max-w-24 sm:max-w-32 md:max-w-48"
                                         x-model="selectedCompetition" @change="filter">
-                                    <option value="-1" selected>Toutes</option>
+                                    <option value="-1" selected>Toutes les compétitions</option>
                                     <template x-for="choice in competition_choices" :key="choice.id">
                                         <option :value="choice.id" x-text="choice.name"></option>
                                     </template>
