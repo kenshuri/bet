@@ -6,13 +6,18 @@ from django.contrib.auth import login, authenticate
 from django.db.models import Q
 
 import polars as pl
-# from silk.profiling.profiler import silk_profile
 
 from accounts.forms import CustomUserCreationForm
 from bet.forms import SignUpForm, BetForm, LeagueForm, CompetitionForm, GameForm, TeamForm
 from bet.models import Game, Bet, CustomUser, League, Competition, Team, ActivityType, GameType
 from django.utils import timezone
 from bet.utils import get_table, get_game_results, Result, Ranking, get_predictions, get_leagues, get_results, get_results_as_user
+
+from dotenv import load_dotenv
+import os
+
+if os.getenv('ENV')=='DEV':
+    from silk.profiling.profiler import silk_profile
 
 
 
@@ -59,6 +64,7 @@ def leagues_legacy(request):
     return render(request, 'bet/leagues_legacy.html', context=context)
 
 
+# @silk_profile(name='View Predictions')
 @login_required
 def predictions(request):
     data = get_predictions(request.user.id)
@@ -69,6 +75,8 @@ def predictions(request):
         'user_id': request.user.id,
     }
     return render(request, "bet/predictions.html", context=context)
+
+
 
 def leagues(request):
     leagues_df = get_leagues(request.user.id)
@@ -96,14 +104,16 @@ def leagues(request):
     return render(request, "bet/leagues.html", context=context)
 
 
-
+# @silk_profile(name='View Specific League')
 @login_required
 def league(request, league_id:int):
+    if not CustomUser.objects.filter(id=request.user.id).filter(leagues_played=league_id).exists():
+        return redirect('leagues')
     #TODO: check case where league exist but no game defined on the league
     predictions = get_predictions(request.user.id).filter(league_id=league_id)
     results = get_results_as_user(request.user.id)
     if results.shape[0] > 0:
-        results.filter(league_id=league_id)
+        results = results.filter(league_id=league_id)
     leagues_df = get_leagues(request.user.id)
     league_list = [{
         'league_id': league.item(0, 'league_id'),

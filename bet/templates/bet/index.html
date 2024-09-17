@@ -11,7 +11,8 @@
     <div>
         <h3 class="flex p-2 font-semibold">Mes prochains pronos</h3>
         <div x-data="{
-                filteredPredictions: {{ predictions_json }} }">
+                filteredPredictions: {{ predictions_json }},
+                 hideLeagueButton: false}">
             <template x-for="p in filteredPredictions" :key="p.id_temp">
                 <c-prediction></c-prediction>
             </template>
@@ -23,7 +24,8 @@
         <div x-data="{
             results: {{ results_json }},
             user_id: {{ user_id }},
-            filteredResults: {{ results_json }}
+            filteredResults: {{ results_json }},
+            hideLeagueButton: false
          }">
             <template x-for="p in results" :key="p.id_temp">
                 <c-result></c-result>

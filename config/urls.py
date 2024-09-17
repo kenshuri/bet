@@ -18,6 +18,10 @@ from django.urls import path, include
 from ninja import NinjaAPI
 from api.api import router as api_router
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 import bet.views
 
 api = NinjaAPI()
@@ -51,7 +55,8 @@ urlpatterns = [
 ]
 
 # silk middleware
-# urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
+if os.environ.get('ENV')=='DEV':
+    urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]
 
 # API
 urlpatterns += [path('api/', api.urls)]

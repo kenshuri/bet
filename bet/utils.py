@@ -63,10 +63,11 @@ class LeagueScore:
         self.user_score = df.to_dicts()
 
 
-def get_results(user_id:int) -> pl.DataFrame:
-    user_games = Game.objects.filter(competition__league__users=user_id).filter(
-        score_team1__isnull=False, score_team2__isnull=False
-    ).values(
+def get_results(user_id:int,) -> pl.DataFrame:
+    # user_games = Game.objects.filter(competition__league__users=user_id).filter(
+    #     score_team1__isnull=False, score_team2__isnull=False
+    # )
+    user_games = Game.objects.filter(competition__league__users=user_id).values(
         'id', 'start_datetime', 'game_type',
         'team_1__name', 'team_2__name',
         'score_team1', 'score_team2',
@@ -93,11 +94,21 @@ def get_results(user_id:int) -> pl.DataFrame:
     ).filter(
         league_id__in=data.get_column('league_id').unique().to_list()
     ).values('id', 'league_id', 'user_id', 'game_id', 'score_team1', 'score_team2')
-    ub = pl.from_records(list(users_bets)).rename({
-        'id': 'bet_id',
-        'score_team1': 'bet_score_team1',
-        'score_team2': 'bet_score_team2',
-    })
+    if users_bets.exists():
+        ub = pl.from_records(list(users_bets)).rename({
+            'id': 'bet_id',
+            'score_team1': 'bet_score_team1',
+            'score_team2': 'bet_score_team2',
+        })
+    else:
+        ub = pl.DataFrame().with_columns(
+            pl.lit(None).cast(pl.Int64).alias('bet_id'),
+            pl.lit(None).cast(pl.Int64).alias('league_id'),
+            pl.lit(None).cast(pl.Int64).alias('user_id'),
+            pl.lit(None).cast(pl.Int64).alias('game_id'),
+            pl.lit(None).cast(pl.Int64).alias('bet_score_team1'),
+            pl.lit(None).cast(pl.Int64).alias('bet_score_team2')
+        )
 
     data = data.join(ub, how='left', on=['user_id', 'league_id', 'game_id'])
 
@@ -131,7 +142,7 @@ def get_results(user_id:int) -> pl.DataFrame:
     ).with_columns(
         pl.when(pl.col('bet_result') != 0)
         .then(True).otherwise(False).alias('bet_exists'),
-        pl.when(pl.col('bet_result') == pl.col('game_result'))
+        pl.when((pl.col('bet_result') == pl.col('game_result')) & (pl.col('game_result') != 0))
         .then(True).otherwise(False).alias('bet_ok'),
         pl.when((pl.col('score_team1') == pl.col('bet_score_team1'))
                 & (pl.col('score_team2') == pl.col('bet_score_team2')))
@@ -151,21 +162,23 @@ def get_results(user_id:int) -> pl.DataFrame:
         pl.when(pl.col('bet_perfect') == True)
         .then(pl.col('leagues_played__bonus_perfect') / pl.col('bet_perfect_count'))
         .otherwise(0).alias('perfect_points'),
-    ).with_columns(
+        ).with_columns(
         pl.when((pl.col('leagues_played__bonus_stake') == 1) & (pl.col('game_type') != 0))
         .then(1 + 1 / pl.col('game_type')).otherwise(1).alias('stake_factor'),
-    ).with_columns(
+        ).with_columns(
         ((pl.col('ok_points') + pl.col('perfect_points')) * pl.col('stake_factor')).round(4).alias('total_points'),
     ).with_row_index('id_temp', offset=1
                      ).with_columns(
         pl.col('start_datetime').dt.convert_time_zone("Europe/Paris").dt.strftime("%d/%m/%Y %H:%M").alias("start_datetime_str")
     ).with_columns(
-        pl.when(pl.col('bet_perfect')==True).then(3)
+        pl.when(pl.col('bet_exists')==False).then(0)
+        .when(pl.col('game_result')==0).then(4)
+        .when(pl.col('bet_perfect')==True).then(3)
         .when(pl.col('bet_ok') == True).then(2)
         .when(pl.col('bet_exists') == True).then(1)
         .otherwise(0).alias('user_bet'),
         pl.col('total_points').round(0).alias('total_points_rounded'),
-    ).with_columns(
+        ).with_columns(
         pl.concat_str(['league_id', 'game_id'], separator='_').alias('league_game_ids')
     )
     return data
@@ -199,9 +212,6 @@ def get_results_as_user(user_id:int):
 
 def get_leagues(user_id:int) -> pl.DataFrame:
     data = get_results(user_id)
-    if data.shape[0] == 0:
-        return pl.DataFrame()
-
     leagues = data.group_by(['league_id', 'league__name', 'league__short_name',
                              'competition_id', 'competition__name', 'competition__short_name',
                              'leagues_played__bonus_perfect', 'leagues_played__bonus_stake',

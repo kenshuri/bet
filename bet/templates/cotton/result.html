@@ -57,6 +57,11 @@
                                    <i class="fa-solid fa-check-double"></i>
                             </span>
                 </template>
+                <template x-if="p.user_bet === 4">
+                    <span class="flex items-center p-1 border rounded">
+                                   <i class="fa-solid fa-clock-rotate-right"></i>
+                            </span>
+                </template>
                 <span class="ml-1"
                       x-text="p.total_points_rounded">
                 </span>
@@ -119,7 +124,7 @@
                     </tr>
                 </template>
             </table>
-            <div class="flex flex-shrink p-2 items-center justify-end">
+            <div x-show="!hideLeagueButton" class="flex flex-shrink p-2 items-center justify-end">
                 <a :href="'/league/'+ p.league_id">
                     <button type="button" class="btn btn-sm px-4 btn-primary">
                         <i class="fa-solid fa-trophy"></i>

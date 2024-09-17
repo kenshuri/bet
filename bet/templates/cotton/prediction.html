@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-shrink p-2 items-center justify-center">
+            <div x-show="!hideLeagueButton" class="flex flex-shrink p-2 items-center justify-center">
                 <a :href="'/league/'+ p.league_id">
                     <button type="button" class="btn btn-sm px-4 btn-primary">
                         <i class="fa-solid fa-trophy"></i>
