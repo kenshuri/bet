@@ -184,9 +184,13 @@ def get_results(user_id:int,) -> pl.DataFrame:
     return data
 
 def get_results_as_user(user_id:int):
-    results = get_results(user_id).filter(pl.col('start_datetime') < timezone.now())
+    results = get_results(user_id)
     if results.shape[0] == 0:
         return pl.DataFrame()
+    results = results.filter(pl.col('start_datetime') < timezone.now())
+    if results.shape[0] == 0:
+        return pl.DataFrame()
+
     results_as_user = results.filter(pl.col('user_id') == user_id)
 
     results_details = [
