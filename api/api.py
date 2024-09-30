@@ -1,18 +1,25 @@
 import datetime
 from typing import Optional
 
+from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.utils import IntegrityError
+from django_browser_reload.views import message
 
-from ninja import Router, Schema, Form
+from ninja import Router, Schema, Form, NinjaAPI
 # from silk.profiling.profiler import silk_profile
 import polars as pl
+from polars import Boolean
+from pydantic import field_validator
 
 from accounts.models import CustomUser
+from bet.forms import BetForm
 from bet.models import Team, Game, League, Bet, Competition
 from api.schemas import TeamOut, GameOut, BetOut, BetsOut, PredictionOut, TestIn, TestOut, BetIn, LeagueOut
 from bet.utils import get_predictions, get_leagues, LeagueScore
 
 router = Router()
+api = NinjaAPI()
 
 @router.get("/teams/{int:user_id}", response=list[TeamOut])
 def teams(request, user_id: int):
@@ -35,8 +42,39 @@ def leagues(request, user_id: int):
 
 
 @router.post("/test", response=BetOut)
-def test(request, bet: Form[BetIn]):
-    return bet
+def test(request, bet: BetIn):
+    bet_dict = bet.model_dump()
+    new_bet = Bet(**bet_dict)
+    field = new_bet._meta.get_field('score_team1')
+
+    ## Validate data based on Bet models
+    try:
+        new_bet.full_clean()
+    except ValidationError as e:
+        message = str(e)
+        return api.create_response(
+            request,
+            {"message": message},
+            status=400,
+        )
+
+    ## Check that the GAME belongs the same COMPETITION as the LEAGUE
+
+    ## Try to insert data in database
+    try:
+        new_bet = Bet.objects.create(**bet_dict)
+    except IntegrityError as e:
+        if 'UNIQUE constraint failed' in str(e):
+            message =  f"UNIQUE constraint failed: a bet with the same user_id={bet_dict['user_id']} game_id={bet_dict['game_id']} league_id={bet_dict['league_id']} already exists."
+        else:
+            message = str(e)
+        return api.create_response(
+            request,
+            {"message": message},
+            status=409,
+        )
+    return new_bet
+
 
 
 @router.get("/games", response=list[GameOut])

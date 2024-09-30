@@ -1,5 +1,6 @@
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from accounts.models import CustomUser
 from django.core.validators import MinValueValidator
@@ -128,3 +129,26 @@ class Bet(models.Model):
 
     def __str__(self):
         return f"{self.user} bet on {self.game} in league {self.league}"
+
+    def clean(self):
+        # Always call the parent class's clean method first
+        super().clean()
+
+        # Check that user in league
+        if League.objects.filter(id=self.league_id).exists():
+            if not CustomUser.objects.filter(leagues_played=self.league_id).filter(id=self.user_id).exists():
+                message = f'User {self.user_id} does not play in League id {self.league_id}'
+                raise ValidationError({
+                    'league_id': message
+                })
+
+        # Check that game and league point to same competition
+        if Game.objects.filter(id=self.game_id).exists() and League.objects.filter(id=self.league_id).exists():
+            game_competition_id = self.game.competition_id
+            league_competition_id =  self.league.competition_id
+
+            if game_competition_id !=  league_competition_id:
+                message = f'The league {self.league.id} is not defined on the same competition as the game {self.game.id}. self.game.competition.id={game_competition_id} != self.league.id = {league_competition_id}'
+                raise ValidationError({
+                    'league_id': message
+                })
