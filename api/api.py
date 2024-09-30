@@ -57,22 +57,6 @@ def test(request, bet: BetIn):
             {"message": message},
             status=400,
         )
-
-    ## Check that the GAME belongs the same COMPETITION as the LEAGUE
-
-    ## Try to insert data in database
-    try:
-        new_bet = Bet.objects.create(**bet_dict)
-    except IntegrityError as e:
-        if 'UNIQUE constraint failed' in str(e):
-            message =  f"UNIQUE constraint failed: a bet with the same user_id={bet_dict['user_id']} game_id={bet_dict['game_id']} league_id={bet_dict['league_id']} already exists."
-        else:
-            message = str(e)
-        return api.create_response(
-            request,
-            {"message": message},
-            status=409,
-        )
     return new_bet
 
 
