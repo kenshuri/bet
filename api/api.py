@@ -2,6 +2,7 @@ import datetime
 from typing import Optional
 
 from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.utils import IntegrityError
 from django_browser_reload.views import message
@@ -41,15 +42,14 @@ def leagues(request, user_id: int):
     return x
 
 
-@router.post("/test", response=BetOut)
-def test(request, bet: BetIn):
+@router.post("/bet", response=BetOut)
+def create_bet(request, bet: BetIn):
     bet_dict = bet.model_dump()
-    new_bet = Bet(**bet_dict)
-    field = new_bet._meta.get_field('score_team1')
+    created_bet = Bet(**bet_dict)
 
     ## Validate data based on Bet models
     try:
-        new_bet.full_clean()
+        created_bet.full_clean()
     except ValidationError as e:
         message = str(e)
         return api.create_response(
@@ -57,7 +57,31 @@ def test(request, bet: BetIn):
             {"message": message},
             status=400,
         )
-    return new_bet
+
+    created_bet = Bet.objects.create(**bet_dict)
+    return created_bet
+
+
+
+@router.put("/bet/{bet_id}", response=BetOut)
+def update_bet(request, bet_id: int, bet: BetIn):
+    updated_bet = get_object_or_404(Bet, id=bet_id)
+    for attr, value in bet.dict().items():
+        setattr(updated_bet, attr, value)
+
+    ## Validate data based on Bet models
+    try:
+        updated_bet.full_clean()
+    except ValidationError as e:
+        message = str(e)
+        return api.create_response(
+            request,
+            {"message": message},
+            status=400,
+        )
+
+    updated_bet.save()
+    return updated_bet
 
 
 
