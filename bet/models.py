@@ -16,6 +16,7 @@ class ActivityType(models.IntegerChoices):
     MIXED = 0, _('Mixed')  #  For a competition -> means that any type of team can participate, for a team -> means it's a country team
     FOOTBALL = 1001, _('Football')
     TENNIS = 1002, _('Tennis')
+    CHESS = 2001, _('Chess')
 
 
 class GameType(models.IntegerChoices):
@@ -139,7 +140,7 @@ class Bet(models.Model):
             if not CustomUser.objects.filter(leagues_played=self.league_id).filter(id=self.user_id).exists():
                 message = f'User {self.user_id} does not play in League id {self.league_id}'
                 raise ValidationError({
-                    'league_id': message
+                    'league': message
                 })
 
         # Check that game and league point to same competition
@@ -150,5 +151,5 @@ class Bet(models.Model):
             if game_competition_id !=  league_competition_id:
                 message = f'The league {self.league.id} is not defined on the same competition as the game {self.game.id}. self.game.competition.id={game_competition_id} != self.league.id = {league_competition_id}'
                 raise ValidationError({
-                    'league_id': message
+                    'league': message
                 })
